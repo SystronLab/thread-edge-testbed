@@ -162,37 +162,40 @@ def ping_demo():
 def console():
     cmd = ""
     while cmd != "quit":
-        cmd = input(">")
-        
-        if "demo" in cmd.split()[0]:
-            if "ping" in cmd:
-                print(ping_demo())        
-        
-        elif "config" in cmd:
-            number = 1
-            try:
-                number = int(re.findall(r"\d+", cmd)[0])
-            except:
-                pass
-            print("Configuring network with " + str(number) + " router...")
-            config_devices(number)
+        try:
+            cmd = input(">")
             
-        elif "state" in cmd:
-            print(get_network_state())
+            if "demo" in cmd.split()[0]:
+                if "ping" in cmd:
+                    print(ping_demo())        
             
-        elif "start" in cmd:
-            print("Starting thread network...")
-            start_network()
-            print(get_network_state())
-        
-        elif "stop" in cmd:
-            print("Stopping thread network...")
-            stop_network()
-            print(get_network_state())
+            elif "config" in cmd:
+                number = 1
+                try:
+                    number = int(re.findall(r"\d+", cmd)[0])
+                except:
+                    pass
+                print("Configuring network with " + str(number) + " router...")
+                config_devices(number)
                 
-        else:
-            print("Unknown Command")
-
+            elif "state" in cmd:
+                print(get_network_state())
+                
+            elif "start" in cmd:
+                print("Starting thread network...")
+                start_network()
+                print(get_network_state())
+            
+            elif "stop" in cmd:
+                print("Stopping thread network...")
+                stop_network()
+                print(get_network_state())
+                    
+            else:
+                print("Unknown Command")
+        except KeyboardInterrupt:
+            cmd = "quit"
+    stop_network()
 
 if __name__ == "__main__":
     available_ports = get_ports()
