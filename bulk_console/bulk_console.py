@@ -55,10 +55,13 @@ class ot_device:
         return res
     
     def ping(self, address):
-        print("address to ping " + address)
         res = self.run_command("ping " + address)
         res_arr = res.split(' ')
-        return float(re.findall("\d+\.\d+", res_arr[res_arr.index('Packet') + 3])[0])
+        try:
+            drop_rate = float(re.findall("\d+\.\d+", res_arr[res_arr.index('Packet') + 3])[0])
+            return drop_rate
+        except:
+            return "error"
         
 
 # Get available COM ports
@@ -154,12 +157,13 @@ def stop_network():
 
 # Get IP addresses of each device and state of each device
 def ping_demo():
+    res = "Sender | Receiver | Drop Rate\n" 
     for device in thread_devices:
         for receiver in thread_devices:
             if device != receiver:
-                print(device.port)
-                device.ping(receiver.ipaddr)
-    return ""
+                drop_rate = device.ping(receiver.ipaddr)
+                res += device.rloc + " | " + receiver.rloc + " | " + str(drop_rate) + "\n"
+    return res
 
 def console():
     cmd = ""
