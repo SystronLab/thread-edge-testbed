@@ -2,6 +2,9 @@ import serial
 import time
 import serial.tools.list_ports as ports_list
 import re
+import os
+import sys
+import glob
 
 available_ports = []
 thread_devices = []
@@ -19,7 +22,7 @@ MTD_TXPOWER = -20
 class ot_device:
     def __init__(self, port):
         self.port = port  # COM Port
-        self.serial = serial.Serial(self.port, 115200, timeout=0.1, write_timeout=1.0)
+        self.serial = serial.Serial(self.port, 115200, timeout=0.1, write_timeout=0.1)
         self.platform = ""  # zephyr or efr32
         self.rloc = ""
         self.ipaddr = ""
@@ -52,32 +55,42 @@ class ot_device:
         return res
     
     def ping(self, address):
+        print("address to ping " + address)
         res = self.run_command("ping " + address)
         print(res)
 
 # Get available COM ports
 def get_ports():
-    ports_l = list(ports_list.comports())
+    ports_l = []
+    if sys.platform.startswith("win"):
+        ports = list(ports_list.comports())
+        for port in ports:
+            ports_l.append(port.name)
+    elif sys.platform.startswith("linux") or sys.platform.startswith("cygwin"):
+        ports_l = glob.glob('/dev/ttyACM*')
+    else:
+        print("No available ports found")
     if len(ports_l):
         print("\n" + str(len(ports_l)) + " serial connections found")
     return ports_l
 
 
 def link_devices():
-    print("Thread devices:")
+    print("Finding thread devices...")
     for port in available_ports:
-        device = ot_device(port.name)
-        platform = device.run_command("\r\nplatform")
-        if "EFR32" in platform:
-            device.platform = SLABS_PLATFORM
-            thread_devices.append(device)
-            print(port.name + " | ERF32")
-        platform = device.run_command("\r\not platform")
-        if "Zephyr" in platform:
-            device.platform = NRF_PLATFORM
-            thread_devices.append(device)
-            print(port.name + " | Zephyr")
-
+        if (os.path.exists(port) and int(re.findall(r'\d+', port)[0]) > 1): # ignore ACM0 and 1 because they are not used in this setup
+            device = ot_device(port)
+            platform = device.run_command("\r\nplatform")
+            if "EFR32" in platform:
+                device.platform = SLABS_PLATFORM
+                thread_devices.append(device)
+            platform = device.run_command("\r\not platform")
+            if "Zephyr" in platform:
+                device.platform = NRF_PLATFORM
+                thread_devices.append(device)
+    for device in thread_devices:
+        print(device.port + " | " + device.platform)
+        
 
 def config_devices(routers=1):
     router = False
@@ -96,6 +109,7 @@ def config_devices(routers=1):
         device.run_command("dataset panid" + PAN_ID)
         device.run_command("dataset commit active")
         try:
+            device.run_command("ifconfig up")
             device.rloc = re.findall(r'\d+', device.run_command("rloc16"))[0]
             device.ipaddr = device.run_command("ipaddr").split('\n')[0]
             device.failed = False
@@ -119,6 +133,8 @@ def get_network_state():
         elif "leader" in device_state:
             s = "leader"
         network_state += device.port + " | " + device.rloc + " | " + s + "\n"
+        if s == "unknown":
+            print(device_state)
     return network_state[:-1]  # remove trailing carriage return
 
 
@@ -144,12 +160,11 @@ def ping_demo():
     return ""
 
 def console():
-    while True:
+    cmd = ""
+    while cmd != "quit":
         cmd = input(">")
-        if cmd == "quit":
-            break
         
-        elif "demo" in cmd.split()[0]:
+        if "demo" in cmd.split()[0]:
             if "ping" in cmd:
                 print(ping_demo())        
         
@@ -159,18 +174,19 @@ def console():
                 number = int(re.findall(r"\d+", cmd)[0])
             except:
                 pass
+            print("Configuring network with " + str(number) + " router...")
             config_devices(number)
             
         elif "state" in cmd:
             print(get_network_state())
             
         elif "start" in cmd:
-            print("Starting thread network")
+            print("Starting thread network...")
             start_network()
             print(get_network_state())
         
         elif "stop" in cmd:
-            print("Stopping thread network")
+            print("Stopping thread network...")
             stop_network()
             print(get_network_state())
                 
