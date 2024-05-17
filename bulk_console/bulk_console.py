@@ -50,14 +50,16 @@ class ot_device:
     # Get output and format lines
     def get_output(self):
         self.serial.readline()
-        res = self.serial.read(200)
+        res = self.serial.read(500)
         res = res.decode()
         return res
     
     def ping(self, address):
         print("address to ping " + address)
         res = self.run_command("ping " + address)
-        print(res)
+        res_arr = res.split(' ')
+        return float(re.findall("\d+\.\d+", res_arr[res_arr.index('Packet') + 3])[0])
+        
 
 # Get available COM ports
 def get_ports():
@@ -168,7 +170,7 @@ def console():
             if "demo" in cmd.split()[0]:
                 if "ping" in cmd:
                     print(ping_demo())        
-            
+
             elif "config" in cmd:
                 number = 1
                 try:
