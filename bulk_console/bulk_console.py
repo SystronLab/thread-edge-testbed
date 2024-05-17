@@ -83,8 +83,8 @@ def get_ports():
 def link_devices():
     print("Finding thread devices...")
     for port in available_ports:
-        # if (os.path.exists(port) and int(re.findall(r'\d+', port)[0]) > 1): # TODO fix this - windows takes issue with os.path.exists it seems
-        if (int(re.findall(r'\d+', port)[0]) > 1):
+        if (os.path.exists(port) and int(re.findall(r'\d+', port)[0]) > 1): # TODO fix this - windows takes issue with os.path.exists it seems
+        # if (int(re.findall(r'\d+', port)[0]) > 1):
             device = ot_device(port)
             platform = device.run_command("\r\nplatform")
             if "EFR32" in platform:
@@ -103,6 +103,7 @@ def config_devices(routers=1):
     router_count = 0
     for device in thread_devices:
         if not router:
+            # device.run_command("dataset init new")
             device.run_command("txpower " + str(FTD_TXPOWER))
             device.run_command("mode rdn")
             if router_count == routers:
@@ -208,3 +209,8 @@ if __name__ == "__main__":
     available_ports = get_ports()
     link_devices()
     console()
+
+## TODO
+# info panel for all devices
+# - show ip address, panid, networkkey etc.
+#
