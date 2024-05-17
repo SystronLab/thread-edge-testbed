@@ -83,7 +83,8 @@ def get_ports():
 def link_devices():
     print("Finding thread devices...")
     for port in available_ports:
-        if (os.path.exists(port) and int(re.findall(r'\d+', port)[0]) > 1): # ignore ACM0 and 1 because they are not used in this setup
+        # if (os.path.exists(port) and int(re.findall(r'\d+', port)[0]) > 1): # TODO fix this - windows takes issue with os.path.exists it seems
+        if (int(re.findall(r'\d+', port)[0]) > 1):
             device = ot_device(port)
             platform = device.run_command("\r\nplatform")
             if "EFR32" in platform:
