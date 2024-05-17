@@ -23,7 +23,13 @@ The state of the network can then be viewed with
 ```
 >state
 ```
-This will display the status of each device (detailed under ```status``` in commands below) as well as the IP address and COM port it is connected to 
+This will display the status of each device (detailed under ```status``` in commands below) as well as the IP address and COM port it is connected to.
+
+The network can be stopped with 
+```
+>stop
+```
+The network will also stop upon quitting the console, with either ```quit``` or a keyboard interrupt (Ctrl + C)
 
 ### Adding other platforms:
 To interact with devices of another platform run the ```platform``` command in the function ```link_devices()``` following the ESR32 and Zephyr platform examples. If a prefix is required for interacting with the CLI for that platform (e.g. adding ```ot ``` to the beginning of commands for Zephyr based devices) then add functionality for that in ```ot_device.run_command(command)```.
