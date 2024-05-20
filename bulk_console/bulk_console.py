@@ -22,11 +22,11 @@ MTD_TXPOWER = -20
 class ot_device:
     def __init__(self, port):
         self.port = port  # COM Port
-        self.serial = serial.Serial(self.port, 115200, timeout=0.1, write_timeout=0.1)
+        self.serial = serial.Serial(self.port, 115200, timeout=0.2, write_timeout=0.1)
         self.platform = ""  # zephyr or efr32
         self.rloc = ""
         self.ipaddr = ""
-        self.failed = False # TODO do something with this flag
+        self.failed = False  # TODO do something with this flag
 
     # Safely open port only if not open
     def open_port(self):
@@ -53,16 +53,26 @@ class ot_device:
         res = self.serial.read(500)
         res = res.decode()
         return res
-    
+
     def ping(self, address):
         res = self.run_command("ping " + address)
-        res_arr = res.split(' ')
+        res_arr = res.split(" ")
         try:
-            drop_rate = float(re.findall("\d+\.\d+", res_arr[res_arr.index('Packet') + 3])[0])
+            drop_rate = float(
+                re.findall("\d+\.\d+", res_arr[res_arr.index("Packet") + 3])[0]
+            )
             return drop_rate
         except:
             return "error"
         
+    def get_ip_addr(self):
+        ipaddr_res = self.run_command("ipaddr").split('\n')
+        address = [ip.strip() for ip in ipaddr_res if ":" in ip]
+        extaddr = self.run_command("extaddr").split()[0]
+        for ip in address:
+            if ip[-15:].replace(':', '') == extaddr[-12:]:
+                self.ipaddr = ip
+
 
 # Get available COM ports
 def get_ports():
@@ -72,7 +82,7 @@ def get_ports():
         for port in ports:
             ports_l.append(port.name)
     elif sys.platform.startswith("linux") or sys.platform.startswith("cygwin"):
-        ports_l = glob.glob('/dev/ttyACM*')
+        ports_l = glob.glob("/dev/ttyACM*")
     else:
         print("No available ports found")
     if len(ports_l):
@@ -83,8 +93,10 @@ def get_ports():
 def link_devices():
     print("Finding thread devices...")
     for port in available_ports:
-        if (os.path.exists(port) and int(re.findall(r'\d+', port)[0]) > 1): # TODO fix this - windows takes issue with os.path.exists it seems
-        # if (int(re.findall(r'\d+', port)[0]) > 1):
+        if (
+            os.path.exists(port) and int(re.findall(r"\d+", port)[0]) > 1
+        ):  # TODO fix this - windows takes issue with os.path.exists it seems
+            # if (int(re.findall(r'\d+', port)[0]) > 1):
             device = ot_device(port)
             platform = device.run_command("\r\nplatform")
             if "EFR32" in platform:
@@ -96,14 +108,14 @@ def link_devices():
                 thread_devices.append(device)
     for device in thread_devices:
         print(device.port + " | " + device.platform)
-        
+
 
 def config_devices(routers=1):
     router = False
     router_count = 0
     for device in thread_devices:
         if not router:
-            # device.run_command("dataset init new")
+            device.run_command("dataset init new")
             device.run_command("txpower " + str(FTD_TXPOWER))
             device.run_command("mode rdn")
             if router_count == routers:
@@ -111,20 +123,19 @@ def config_devices(routers=1):
         else:
             device.run_command("txpower " + str(MTD_TXPOWER))
             device.run_command("mode rn")
-        device.run_command("dataset channel" + CHANNEL)
-        device.run_command("dataset networkkey" + NETWORK_KEY)
-        device.run_command("dataset panid" + PAN_ID)
+        device.run_command("dataset channel " + CHANNEL)
+        device.run_command("dataset networkkey " + NETWORK_KEY)
+        device.run_command("dataset panid " + PAN_ID)
         device.run_command("dataset commit active")
         try:
             device.run_command("ifconfig up")
-            device.rloc = re.findall(r'\d+', device.run_command("rloc16"))[0]
-            device.ipaddr = device.run_command("ipaddr").split('\n')[0]
+            device.rloc = re.findall(r"\d+", device.run_command("rloc16"))[0]
             device.failed = False
         except:
             device.failed = True
 
 
-def get_network_state():
+def get_network_state(extended=False):
     network_state = ""
     for device in thread_devices:
         s = "unknown"
@@ -139,9 +150,26 @@ def get_network_state():
             s = "router"
         elif "leader" in device_state:
             s = "leader"
-        network_state += device.port + " | " + device.rloc + " | " + s + "\n"
+        network_state += device.port + " | " + device.rloc + " | " + s
         if s == "unknown":
             print(device_state)
+        if extended:
+            panid = device.run_command("dataset panid")
+            networkkey = device.run_command("dataset networkkey")
+            channel = device.run_command("dataset channel")
+            if device.ipaddr == "":
+                device.get_ip_addr()
+            network_state += (
+                " | PAN ID: "
+                + str(panid.split()[0])
+                + " | Network Key: "
+                + str(networkkey.split()[0])
+                + " | Channel: "
+                + str(channel.split()[0])
+                + " | IP Address: "
+                + device.ipaddr
+            )
+        network_state += "\n"
     return network_state[:-1]  # remove trailing carriage return
 
 
@@ -149,7 +177,10 @@ def start_network():
     for device in thread_devices:
         res = device.run_command("ifconfig up")
         res = device.run_command("thread start")
+        ip = device.run_command("ipaddr")
+        device.ipaddr = device.get_ip_addr()
         # TODO error handling - set failed flag to True if error
+
 
 def stop_network():
     for device in thread_devices:
@@ -157,25 +188,29 @@ def stop_network():
         res = device.run_command("ifconfig down")
         # TODO error handling - set failed flag to True if error
 
+
 # Get IP addresses of each device and state of each device
 def ping_demo():
-    res = "Sender | Receiver | Drop Rate\n" 
+    res = "Sender | Receiver | Drop Rate\n"
     for device in thread_devices:
         for receiver in thread_devices:
             if device != receiver:
                 drop_rate = device.ping(receiver.ipaddr)
-                res += device.rloc + " | " + receiver.rloc + " | " + str(drop_rate) + "\n"
+                res += (
+                    device.rloc + " | " + receiver.rloc + " | " + str(drop_rate) + "\n"
+                )
     return res
+
 
 def console():
     cmd = ""
     while cmd != "quit":
         try:
             cmd = input(">")
-            
+
             if "demo" in cmd.split()[0]:
                 if "ping" in cmd:
-                    print(ping_demo())        
+                    print(ping_demo())
 
             elif "config" in cmd:
                 number = 1
@@ -185,32 +220,36 @@ def console():
                     pass
                 print("Configuring network with " + str(number) + " router...")
                 config_devices(number)
-                
+
             elif "state" in cmd:
                 print(get_network_state())
-                
+
             elif "start" in cmd:
                 print("Starting thread network...")
                 start_network()
                 print(get_network_state())
-            
+
             elif "stop" in cmd:
                 print("Stopping thread network...")
                 stop_network()
                 print(get_network_state())
-                    
+                
+            elif "info" in cmd:
+                print(get_network_state(True))
+
             else:
                 print("Unknown Command")
         except KeyboardInterrupt:
             cmd = "quit"
     stop_network()
 
+
 if __name__ == "__main__":
     available_ports = get_ports()
     link_devices()
     console()
 
-## TODO
-# info panel for all devices
-# - show ip address, panid, networkkey etc.
-#
+'''
+TODO:
+ - format ping demo
+'''
