@@ -38,12 +38,12 @@ class ot_device:
         if self.serial.is_open:
             self.serial.close()
 
-    # Run command and wait 10ms and return formatted output
+    # Run command and return formatted output
     def run_command(self, command):
         if self.platform == NRF_PLATFORM:
             command = "ot " + command
         self.serial.write(bytes(command + "\r\n", "utf-8"))
-        time.sleep(0.1)
+        time.sleep(0.001)
         self.serial.flush()
         return self.get_output()
 
@@ -115,7 +115,7 @@ def config_devices(routers=1):
     router_count = 0
     for device in thread_devices:
         if not router:
-            device.run_command("dataset init new")
+            # device.run_command("dataset init new")
             device.run_command("txpower " + str(FTD_TXPOWER))
             device.run_command("mode rdn")
             if router_count == routers:
@@ -159,16 +159,18 @@ def get_network_state(extended=False):
             channel = device.run_command("dataset channel")
             if device.ipaddr == "":
                 device.get_ip_addr()
-            network_state += (
+            network_info = ""
+            network_info += (
                 " | PAN ID: "
-                + str(panid.split()[0])
+                + panid.split()[0]
                 + " | Network Key: "
-                + str(networkkey.split()[0])
+                + networkkey.split()[0]
                 + " | Channel: "
-                + str(channel.split()[0])
+                + channel.split()[0]
                 + " | IP Address: "
-                + device.ipaddr
+                + str(device.ipaddr)
             )
+            network_state += network_info
         network_state += "\n"
     return network_state[:-1]  # remove trailing carriage return
 
