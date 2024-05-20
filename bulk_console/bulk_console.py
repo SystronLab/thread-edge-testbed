@@ -64,7 +64,14 @@ class ot_device:
             return drop_rate
         except:
             return "error"
-        
+    
+    '''
+    The IP address is convoluted to resolve
+    Multiple addresses are returned, and to find the correct one to ping
+     the final 3 bytes must match the final 3 bytes of the extaddr.
+    On top of that the addresses are in different formats so they also need
+     to be flattened.
+    '''
     def get_ip_addr(self):
         ipaddr_res = self.run_command("ipaddr").split('\n')
         address = [ip.strip() for ip in ipaddr_res if ":" in ip]
