@@ -1,5 +1,4 @@
 import serial
-import pandas
 import serial.tools.list_ports as ports_list
 import re
 import os
