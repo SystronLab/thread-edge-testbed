@@ -23,7 +23,7 @@ The state of the network can then be viewed with
 ```
 >state
 ```
-This will display the status of each device (detailed under ```status``` in commands below) as well as the IP address and COM port it is connected to.
+This will display the status of each device (detailed under ```state``` in commands below) as well as the IP address and COM port it is connected to.
 
 The network can be stopped with 
 ```
