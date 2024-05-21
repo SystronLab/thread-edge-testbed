@@ -249,17 +249,17 @@ def console():
                         device.get_ip_addr()
                     ping = ping_demo()
                     print("Drop Rate between Devices")
-                    print('     ', end='')
+                    print("     ", end="")
                     for device in thread_devices:
-                        print(f'{device.rloc:4} ', end='')
+                        print(f"{device.rloc:4} ", end="")
                     print()
                     for i, device in enumerate(thread_devices):
-                        print(f'{device.rloc:5}', end='')
+                        print(f"{device.rloc:5}", end="")
                         for rate in ping[i]:
-                            if rate == '-':
-                                print(f'{rate:5}', end='')
+                            if rate == "-":
+                                print(f"{rate:5}", end="")
                             else:
-                                print(f'{rate:5}', end='')
+                                print(f"{rate:5}", end="")
                         print()
 
             elif "config" in cmd:
