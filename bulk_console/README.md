@@ -54,7 +54,7 @@ Starts the thread network on each device
 Stops the thread network on each device
 
 ### state
-check the state of all devices in the thread network. Will provide one of
+Check the state of all devices in the thread network. Will provide one of
  - ```disabled```
  - ```detached```
  - ```child```
@@ -63,3 +63,22 @@ check the state of all devices in the thread network. Will provide one of
  - ```unknown```
 
 for each device connected.
+
+### info
+Expands on state, giving PAN ID, Network Key, Channel and IP Address
+
+
+## Demos
+
+Pre configured demonstration events for testing that the system is working.
+
+### Ping
+Usage: ```demo ping```
+Pings all devices from every other device on the network, reporting any dropped packets. Any drop rate above 0.0% is considered a fail in this demonstration - all devices on the network must be able to communicate with one another, and only one packet is being sent from each device.
+
+## Debug Flag
+If the ```DEBUG``` flag is set to ```True```, then extra info will be outputted whilst running, including:
+ - Every command sent to each device, and the full response from each device (formatted to separate responses by device)
+ - The extaddr and ipaddr(esses) of each device when finding the IP address (formatted to separate responses by device)
+ - The available serial connections found by the program
+ - The full rloc response for each device

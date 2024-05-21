@@ -273,9 +273,6 @@ def console():
             elif "info" in cmd:
                 print(get_network_state(True))
 
-            elif "rloc" in cmd:
-                rloc()
-
             else:
                 print("Unknown Command")
         except KeyboardInterrupt:
@@ -290,6 +287,5 @@ if __name__ == "__main__":
 
 """
 TODO:
- - fix ip address getter
  - format ping demo
 """
