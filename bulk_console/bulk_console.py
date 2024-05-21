@@ -251,7 +251,7 @@ def console():
                     print("Drop Rate between Devices")
                     print('     ', end='')
                     for device in thread_devices:
-                        print(f'{device.rloc:5} ', end='')
+                        print(f'{device.rloc:4} ', end='')
                     print()
                     for i, device in enumerate(thread_devices):
                         print(f'{device.rloc:5}', end='')
