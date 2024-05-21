@@ -18,11 +18,13 @@ CHANNEL = "15"
 FTD_TXPOWER = 0
 MTD_TXPOWER = -20
 
+DEBUG = False
+
 
 class ot_device:
     def __init__(self, port):
         self.port = port  # COM Port
-        self.serial = serial.Serial(self.port, 115200, timeout=0.2, write_timeout=0.1)
+        self.serial = serial.Serial(self.port, 115200, timeout=0.1, write_timeout=1.0)
         self.platform = ""  # zephyr or efr32
         self.rloc = ""
         self.ipaddr = ""
@@ -38,21 +40,35 @@ class ot_device:
         if self.serial.is_open:
             self.serial.close()
 
+    """
+    Nordic boards seem to have an issue where the input buffer gets partially rewritten
+     to when running commands in quick succession, specifically after the `ot ifconfig up`
+     command where it leaves `ot ifcoot` in the input buffer.
+    Probably an issue with the serial interface which I could fix, or I could just hit make
+     it run the command, nothing happen because it's unknown and carry on.
+    """
+
+    def reset_buffer(self):
+        self.run_command("\r\n")
+        self.serial.reset_input_buffer()
+        self.serial.reset_output_buffer()
+
     # Run command and return formatted output
     def run_command(self, command):
         if self.platform == NRF_PLATFORM:
             command = "ot " + command
         self.serial.write(bytes(command + "\r\n", "utf-8"))
-        time.sleep(0.001)
-        self.serial.flush()
+        if DEBUG:
+            print("\n" + command)
         return self.get_output()
 
     # Get output and format lines
     def get_output(self):
         self.serial.readline()
-        res = self.serial.read(500)
-        res = res.decode()
-        return res
+        res = self.serial.read(1000)
+        if DEBUG:
+            print(res.decode())
+        return res.decode()
 
     def ping(self, address):
         res = self.run_command("ping " + address)
@@ -64,20 +80,21 @@ class ot_device:
             return drop_rate
         except:
             return "error"
-    
-    '''
+
+    """
     The IP address is convoluted to resolve
     Multiple addresses are returned, and to find the correct one to ping
      the final 3 bytes must match the final 3 bytes of the extaddr.
     On top of that the addresses are in different formats so they also need
      to be flattened.
-    '''
+    """
+
     def get_ip_addr(self):
-        ipaddr_res = self.run_command("ipaddr").split('\n')
+        ipaddr_res = self.run_command("ipaddr").split("\n")
         address = [ip.strip() for ip in ipaddr_res if ":" in ip]
         extaddr = self.run_command("extaddr").split()[0]
         for ip in address:
-            if ip[-15:].replace(':', '') == extaddr[-12:]:
+            if ip[-15:].replace(":", "") == extaddr[-12:]:
                 self.ipaddr = ip
 
 
@@ -94,16 +111,14 @@ def get_ports():
         print("No available ports found")
     if len(ports_l):
         print("\n" + str(len(ports_l)) + " serial connections found")
+        print(ports_l)
     return ports_l
 
 
 def link_devices():
     print("Finding thread devices...")
     for port in available_ports:
-        if (
-            os.path.exists(port) and int(re.findall(r"\d+", port)[0]) > 1
-        ):  # TODO fix this - windows takes issue with os.path.exists it seems
-            # if (int(re.findall(r'\d+', port)[0]) > 1):
+        if os.path.exists(port) and int(re.findall(r"\d+", port)[0]) > 1:
             device = ot_device(port)
             platform = device.run_command("\r\nplatform")
             if "EFR32" in platform:
@@ -122,7 +137,7 @@ def config_devices(routers=1):
     router_count = 0
     for device in thread_devices:
         if not router:
-            # device.run_command("dataset init new")
+            device.run_command("dataset init new")
             device.run_command("txpower " + str(FTD_TXPOWER))
             device.run_command("mode rdn")
             if router_count == routers:
@@ -136,14 +151,15 @@ def config_devices(routers=1):
         device.run_command("dataset commit active")
         try:
             device.run_command("ifconfig up")
-            device.rloc = re.findall(r"\d+", device.run_command("rloc16"))[0]
             device.failed = False
         except:
             device.failed = True
+        device.reset_buffer()
 
 
 def get_network_state(extended=False):
     network_state = ""
+    rloc()
     for device in thread_devices:
         s = "unknown"
         device_state = device.run_command("state")
@@ -179,23 +195,22 @@ def get_network_state(extended=False):
             )
             network_state += network_info
         network_state += "\n"
+        device.reset_buffer()
     return network_state[:-1]  # remove trailing carriage return
 
 
 def start_network():
     for device in thread_devices:
-        res = device.run_command("ifconfig up")
-        res = device.run_command("thread start")
-        ip = device.run_command("ipaddr")
+        device.run_command("ifconfig up")
+        device.run_command("thread start")
+        device.run_command("ipaddr")
         device.ipaddr = device.get_ip_addr()
-        # TODO error handling - set failed flag to True if error
 
 
 def stop_network():
     for device in thread_devices:
-        res = device.run_command("thread stop")
-        res = device.run_command("ifconfig down")
-        # TODO error handling - set failed flag to True if error
+        device.run_command("thread stop")
+        device.run_command("ifconfig down")
 
 
 # Get IP addresses of each device and state of each device
@@ -209,6 +224,12 @@ def ping_demo():
                     device.rloc + " | " + receiver.rloc + " | " + str(drop_rate) + "\n"
                 )
     return res
+
+
+def rloc():
+    for device in thread_devices:
+        rloc = device.run_command("rloc16").split("\n")[0].strip()
+        device.rloc = rloc
 
 
 def console():
@@ -242,9 +263,12 @@ def console():
                 print("Stopping thread network...")
                 stop_network()
                 print(get_network_state())
-                
+
             elif "info" in cmd:
                 print(get_network_state(True))
+
+            elif "rloc" in cmd:
+                rloc()
 
             else:
                 print("Unknown Command")
@@ -258,7 +282,7 @@ if __name__ == "__main__":
     link_devices()
     console()
 
-'''
+"""
 TODO:
  - format ping demo
-'''
+"""
