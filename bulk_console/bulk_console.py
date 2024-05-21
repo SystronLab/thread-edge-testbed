@@ -300,8 +300,3 @@ if __name__ == "__main__":
     available_ports = get_ports()
     link_devices()
     console()
-
-"""
-TODO:
- - format ping demo
-"""
