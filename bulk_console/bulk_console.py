@@ -291,8 +291,9 @@ def console():
                 print("Unknown Command")
         except KeyboardInterrupt:
             cmd = "quit"
-    if cmd != "hq":
-        stop_network()
+    stop_network()
+    for device in thread_devices:
+        device.close_port()
 
 
 if __name__ == "__main__":
