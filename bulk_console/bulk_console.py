@@ -1,5 +1,5 @@
 import serial
-import time
+import pandas
 import serial.tools.list_ports as ports_list
 import re
 import os
@@ -81,7 +81,7 @@ class ot_device:
             )
             return drop_rate
         except:
-            return "error"
+            return "err"
 
     """
     The IP address is convoluted to resolve
@@ -217,14 +217,15 @@ def stop_network():
 
 # Get IP addresses of each device and state of each device
 def ping_demo():
-    res = "Sender | Receiver | Drop Rate\n"
+    res = []
     for device in thread_devices:
+        dev_res = []
         for receiver in thread_devices:
-            if device != receiver:
-                drop_rate = device.ping(receiver.ipaddr)
-                res += (
-                    device.rloc + " | " + receiver.rloc + " | " + str(drop_rate) + "\n"
-                )
+            if device == receiver:
+                dev_res.append("-")
+            else:
+                dev_res.append(str(device.ping(receiver.ipaddr)))
+        res.append(dev_res)
     return res
 
 
@@ -238,7 +239,7 @@ def rloc():
 
 def console():
     cmd = ""
-    while cmd != "quit":
+    while cmd != "quit" or cmd != "hq":
         try:
             cmd = input(">")
 
@@ -246,7 +247,20 @@ def console():
                 if "ping" in cmd:
                     for device in thread_devices:
                         device.get_ip_addr()
-                    print(ping_demo())
+                    ping = ping_demo()
+                    print("Drop Rate between Devices")
+                    print('     ', end='')
+                    for device in thread_devices:
+                        print(f'{device.rloc:5} ', end='')
+                    print()
+                    for i, device in enumerate(thread_devices):
+                        print(f'{device.rloc:5}', end='')
+                        for rate in ping[i]:
+                            if rate == '-':
+                                print(f'{rate:5}', end='')
+                            else:
+                                print(f'{rate:5}', end='')
+                        print()
 
             elif "config" in cmd:
                 number = 1
@@ -277,7 +291,8 @@ def console():
                 print("Unknown Command")
         except KeyboardInterrupt:
             cmd = "quit"
-    stop_network()
+    if cmd != "hq":
+        stop_network()
 
 
 if __name__ == "__main__":
