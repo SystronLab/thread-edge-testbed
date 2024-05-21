@@ -49,12 +49,14 @@ class ot_device:
     """
 
     def reset_buffer(self):
-        self.run_command("\r\n")
+        self.serial.write(bytes("\r\n", "utf-8"))
+        self.serial.read(1000)
         self.serial.reset_input_buffer()
         self.serial.reset_output_buffer()
 
     # Run command and return formatted output
     def run_command(self, command):
+        self.reset_buffer()
         if self.platform == NRF_PLATFORM:
             command = "ot " + command
         self.serial.write(bytes(command + "\r\n", "utf-8"))
@@ -93,6 +95,8 @@ class ot_device:
         ipaddr_res = self.run_command("ipaddr").split("\n")
         address = [ip.strip() for ip in ipaddr_res if ":" in ip]
         extaddr = self.run_command("extaddr").split()[0]
+        if DEBUG:
+            print(self.port + " | " + address + " | " + extaddr)
         for ip in address:
             if ip[-15:].replace(":", "") == extaddr[-12:]:
                 self.ipaddr = ip
@@ -111,7 +115,8 @@ def get_ports():
         print("No available ports found")
     if len(ports_l):
         print("\n" + str(len(ports_l)) + " serial connections found")
-        print(ports_l)
+        if DEBUG:
+            print(ports_l)
     return ports_l
 
 
@@ -154,7 +159,6 @@ def config_devices(routers=1):
             device.failed = False
         except:
             device.failed = True
-        device.reset_buffer()
 
 
 def get_network_state(extended=False):
@@ -180,8 +184,7 @@ def get_network_state(extended=False):
             panid = device.run_command("dataset panid")
             networkkey = device.run_command("dataset networkkey")
             channel = device.run_command("dataset channel")
-            if device.ipaddr == "":
-                device.get_ip_addr()
+            device.get_ip_addr()
             network_info = ""
             network_info += (
                 " | PAN ID: "
@@ -195,7 +198,6 @@ def get_network_state(extended=False):
             )
             network_state += network_info
         network_state += "\n"
-        device.reset_buffer()
     return network_state[:-1]  # remove trailing carriage return
 
 
@@ -229,6 +231,8 @@ def ping_demo():
 def rloc():
     for device in thread_devices:
         rloc = device.run_command("rloc16").split("\n")[0].strip()
+        if DEBUG:
+            print(device.port + " | " + rloc)
         device.rloc = rloc
 
 
@@ -240,6 +244,8 @@ def console():
 
             if "demo" in cmd.split()[0]:
                 if "ping" in cmd:
+                    for device in thread_devices:
+                        device.get_ip_addr()
                     print(ping_demo())
 
             elif "config" in cmd:
@@ -284,5 +290,6 @@ if __name__ == "__main__":
 
 """
 TODO:
+ - fix ip address getter
  - format ping demo
 """
