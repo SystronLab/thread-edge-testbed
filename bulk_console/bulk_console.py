@@ -5,6 +5,7 @@ import re
 import os
 import sys
 import glob
+import time
 
 available_ports = []
 thread_devices = []
@@ -56,6 +57,8 @@ class ot_device:
 
     # Run command and return formatted output
     def run_command(self, command):
+        if "ping" in command:
+            time.sleep(0.2) # Give time to run ping command between devices
         self.reset_buffer()
         if self.platform == NRF_PLATFORM:
             command = "ot " + command
@@ -86,20 +89,16 @@ class ot_device:
     """
     The IP address is convoluted to resolve
     Multiple addresses are returned, and to find the correct one to ping
-     the final 3 bytes must match the final 3 bytes of the extaddr.
+     the final 2 bytes must match the final 2 bytes of the extaddr.
     On top of that the addresses are in different formats so they also need
      to be flattened.
     """
 
     def get_ip_addr(self):
         ipaddr_res = self.run_command("ipaddr").split("\n")
-        address = [ip.strip() for ip in ipaddr_res if ":" in ip]
-        extaddr = self.run_command("extaddr").split()[0]
-        if DEBUG:
-            print(self.port + " | " + (" ").join(address) + " | " + extaddr)
-        for ip in address:
-            if ip[-15:].replace(":", "") == extaddr[-12:]:
-                self.ipaddr = ip
+        for ipaddr in ipaddr_res:
+            if ipaddr[:4] == "fe80":
+                self.ipaddr = ipaddr
 
 
 # Get available COM ports
@@ -278,7 +277,7 @@ def console():
             elif "start" in cmd:
                 print("Starting thread network...")
                 start_network()
-                print(get_network_state())
+                print(get_network_state(True))
 
             elif "stop" in cmd:
                 print("Stopping thread network...")
