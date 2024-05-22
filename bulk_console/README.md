@@ -79,6 +79,5 @@ Pings all devices from every other device on the network, reporting any dropped 
 ## Debug Flag
 If the ```DEBUG``` flag is set to ```True```, then extra info will be outputted whilst running, including:
  - Every command sent to each device, and the full response from each device (formatted to separate responses by device)
- - The extaddr and ipaddr(esses) of each device when finding the IP address (formatted to separate responses by device)
  - The available serial connections found by the program
  - The full rloc response for each device
