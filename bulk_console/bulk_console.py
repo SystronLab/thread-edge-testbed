@@ -5,7 +5,6 @@ import re
 import os
 import sys
 import glob
-import time
 
 available_ports = []
 thread_devices = []
@@ -30,6 +29,7 @@ class ot_device:
         self.rloc = ""
         self.ipaddr = ""
         self.failed = False  # TODO do something with this flag
+        self.state = ""
 
     # Safely open port only if not open
     def open_port(self):
@@ -57,8 +57,6 @@ class ot_device:
 
     # Run command and return formatted output
     def run_command(self, command):
-        if "ping" in command:
-            time.sleep(0.2) # Give time to run ping command between devices
         self.reset_buffer()
         if self.platform == NRF_PLATFORM:
             command = "ot " + command
@@ -133,7 +131,7 @@ def link_devices():
                 device.platform = NRF_PLATFORM
                 thread_devices.append(device)
     for device in thread_devices:
-        print(device.port + " | " + device.platform)
+        print(f'{device.port:15}' + " | " + device.platform)
 
 
 def config_devices(routers=1):
@@ -176,7 +174,7 @@ def get_network_state(extended=False):
             s = "router"
         elif "leader" in device_state:
             s = "leader"
-        network_state += device.port + " | " + device.rloc + " | " + s
+        network_state += f'{device.port:15}' + " | " + device.rloc + " | " + f'{s:9}'
         if s == "unknown":
             print(device_state)
         if extended:
@@ -197,6 +195,7 @@ def get_network_state(extended=False):
             )
             network_state += network_info
         network_state += "\n"
+        device.state = s
     return network_state[:-1]  # remove trailing carriage return
 
 
