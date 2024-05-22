@@ -29,7 +29,6 @@ class ot_device:
         self.rloc = ""
         self.ipaddr = ""
         self.failed = False  # TODO do something with this flag
-        self.state = ""
 
     # Safely open port only if not open
     def open_port(self):
@@ -84,19 +83,12 @@ class ot_device:
         except:
             return "err"
 
-    """
-    The IP address is convoluted to resolve
-    Multiple addresses are returned, and to find the correct one to ping
-     the final 2 bytes must match the final 2 bytes of the extaddr.
-    On top of that the addresses are in different formats so they also need
-     to be flattened.
-    """
-
     def get_ip_addr(self):
         ipaddr_res = self.run_command("ipaddr").split("\n")
+        # print(ipaddr_res, self.rloc)
         for ipaddr in ipaddr_res:
-            if ipaddr[:4] == "fe80":
-                self.ipaddr = ipaddr
+            if ipaddr.strip()[-4:] == self.rloc:
+                self.ipaddr = ipaddr.strip()
 
 
 # Get available COM ports
@@ -138,7 +130,9 @@ def config_devices(routers=1):
     router = False
     router_count = 0
     for device in thread_devices:
+        device.run_command("dataset clear")
         if not router:
+            router_count += 1
             device.run_command("dataset init new")
             device.run_command("txpower " + str(FTD_TXPOWER))
             device.run_command("mode rdn")
@@ -195,7 +189,6 @@ def get_network_state(extended=False):
             )
             network_state += network_info
         network_state += "\n"
-        device.state = s
     return network_state[:-1]  # remove trailing carriage return
 
 
@@ -203,7 +196,7 @@ def start_network():
     for device in thread_devices:
         device.run_command("ifconfig up")
         device.run_command("thread start")
-        device.run_command("ipaddr")
+        device.rloc = device.run_command("rloc16").split("\n")[0].strip()
         device.ipaddr = device.get_ip_addr()
 
 
