@@ -1,4 +1,5 @@
 import serial
+import serial.serialutil
 import serial.tools.list_ports as ports_list
 import re
 import os
@@ -95,7 +96,7 @@ class ot_device:
         address = [ip.strip() for ip in ipaddr_res if ":" in ip]
         extaddr = self.run_command("extaddr").split()[0]
         if DEBUG:
-            print(self.port + " | " + address + " | " + extaddr)
+            print(self.port + " | " + (" ").join(address) + " | " + extaddr)
         for ip in address:
             if ip[-15:].replace(":", "") == extaddr[-12:]:
                 self.ipaddr = ip
@@ -208,10 +209,12 @@ def start_network():
         device.ipaddr = device.get_ip_addr()
 
 
-def stop_network():
+def stop_network(full_stop = False):
     for device in thread_devices:
         device.run_command("thread stop")
         device.run_command("ifconfig down")
+        if full_stop:
+            device.close_port()
 
 
 # Get IP addresses of each device and state of each device
@@ -230,18 +233,17 @@ def ping_demo():
 
 def rloc():
     for device in thread_devices:
-        rloc = device.run_command("rloc16").split("\n")[0].strip()
+        rloc = device.run_command("rloc16")
         if DEBUG:
             print(device.port + " | " + rloc)
-        device.rloc = rloc
+        device.rloc = rloc.split("\n")[0].strip()
 
 
 def console():
     cmd = ""
-    while cmd != "quit" or cmd != "hq":
+    while True:
         try:
             cmd = input(">")
-
             if "demo" in cmd.split()[0]:
                 if "ping" in cmd:
                     for device in thread_devices:
@@ -285,14 +287,15 @@ def console():
 
             elif "info" in cmd:
                 print(get_network_state(True))
+                
+            elif cmd == "quit":
+                break
 
             else:
                 print("Unknown Command")
         except KeyboardInterrupt:
-            cmd = "quit"
-    stop_network()
-    for device in thread_devices:
-        device.close_port()
+            break
+    stop_network(True)
 
 
 if __name__ == "__main__":
