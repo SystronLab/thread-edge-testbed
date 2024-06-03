@@ -5,6 +5,9 @@ import re
 import os
 import sys
 import glob
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
 
 available_ports = []
 thread_devices = []
@@ -123,7 +126,7 @@ def link_devices():
                 device.platform = NRF_PLATFORM
                 thread_devices.append(device)
     for device in thread_devices:
-        print(f'{device.port:15}' + " | " + device.platform)
+        print(f"{device.port:15}" + " | " + device.platform)
 
 
 def config_devices(routers=1):
@@ -168,7 +171,7 @@ def get_network_state(extended=False):
             s = "router"
         elif "leader" in device_state:
             s = "leader"
-        network_state += f'{device.port:15}' + " | " + device.rloc + " | " + f'{s:9}'
+        network_state += f"{device.port:15}" + " | " + device.rloc + " | " + f"{s:9}"
         if s == "unknown":
             print(device_state)
         if extended:
@@ -200,7 +203,7 @@ def start_network():
         device.ipaddr = device.get_ip_addr()
 
 
-def stop_network(full_stop = False):
+def stop_network(full_stop=False):
     for device in thread_devices:
         device.run_command("thread stop")
         device.run_command("ifconfig down")
@@ -230,66 +233,115 @@ def rloc():
         device.rloc = rloc.split("\n")[0].strip()
 
 
-def console():
-    cmd = ""
-    while True:
-        try:
-            cmd = input(">")
-            if "demo" in cmd.split()[0]:
-                if "ping" in cmd:
-                    for device in thread_devices:
-                        device.get_ip_addr()
-                    ping = ping_demo()
-                    print("Drop Rate between Devices")
-                    print("     ", end="")
-                    for device in thread_devices:
-                        print(f"{device.rloc:4} ", end="")
-                    print()
-                    for i, device in enumerate(thread_devices):
-                        print(f"{device.rloc:5}", end="")
-                        for rate in ping[i]:
-                            if rate == "-":
-                                print(f"{rate:5}", end="")
-                            else:
-                                print(f"{rate:5}", end="")
-                        print()
+@app.route("/config", methods=["GET", "POST"])
+def config():
+    if request.method == "GET":
+        if len(thread_devices) == 0:
+            return (
+                jsonify(
+                    isError=True,
+                    message=f"Devices not started",
+                    statusCode=400,
+                ),
+                400,
+            )
+        else:
+            config_devices(1)
+            return (
+                jsonify(
+                    isError=False,
+                    message=f"{len(thread_devices)} devices configured with 1 router",
+                    statusCode=200,
+                ),
+                200,
+            )
+    elif request.method == "POST":
+        if len(thread_devices) == 0:
+            return (
+                jsonify(
+                    isError=True,
+                    message=f"Devices not started",
+                    statusCode=400,
+                ),
+                400,
+            )
+        else:
+            routers = request.form.get("routers")
+            config_devices(routers)
+            return (
+                jsonify(
+                    isError=False,
+                    message=f"{len(thread_devices)} devices configured with {routers} router{'s' if routers > 1 else ''}",
+                    statusCode=200,
+                ),
+                200,
+            )
 
-            elif "config" in cmd:
-                number = 1
-                try:
-                    number = int(re.findall(r"\d+", cmd)[0])
-                except:
-                    pass
-                print("Configuring network with " + str(number) + " router...")
-                config_devices(number)
+@app.route("/state", methods=["GET"])
+def state():
+    if request.method == "GET":
+        # TODO: Format output data
+        return
 
-            elif "state" in cmd:
-                print(get_network_state())
+@app.route("/start", methods=["GET"])
+def start():
+    if request.method == "GET":
+        available_ports = get_ports()
+        link_devices()
+        return (
+            jsonify(
+                isError=False,
+                message=f"Serial Communication started with {len(thread_devices)} devices",
+                statusCode=200,
+            ),
+            200,
+        )
 
-            elif "start" in cmd:
-                print("Starting thread network...")
-                start_network()
-                print(get_network_state(True))
+# def console():
+#     cmd = ""
+#     while True:
+#         try:
+#             cmd = input(">")
+#             if "demo" in cmd.split()[0]:
+#                 if "ping" in cmd:
+#                     for device in thread_devices:
+#                         device.get_ip_addr()
+#                     ping = ping_demo()
+#                     print("Drop Rate between Devices")
+#                     print("     ", end="")
+#                     for device in thread_devices:
+#                         print(f"{device.rloc:4} ", end="")
+#                     print()
+#                     for i, device in enumerate(thread_devices):
+#                         print(f"{device.rloc:5}", end="")
+#                         for rate in ping[i]:
+#                             if rate == "-":
+#                                 print(f"{rate:5}", end="")
+#                             else:
+#                                 print(f"{rate:5}", end="")
+#                         print()
 
-            elif "stop" in cmd:
-                print("Stopping thread network...")
-                stop_network()
-                print(get_network_state())
+#             elif "state" in cmd:
+#                 print(get_network_state())
 
-            elif "info" in cmd:
-                print(get_network_state(True))
-                
-            elif cmd == "quit":
-                break
+#             elif "start" in cmd:
+#                 print("Starting thread network...")
+#                 start_network()
+#                 print(get_network_state(True))
 
-            else:
-                print("Unknown Command")
-        except KeyboardInterrupt:
-            break
-    stop_network(True)
+#             elif "stop" in cmd:
+#                 print("Stopping thread network...")
+#                 stop_network()
+#                 print(get_network_state())
 
+#             elif "info" in cmd:
+#                 print(get_network_state(True))
 
-if __name__ == "__main__":
-    available_ports = get_ports()
-    link_devices()
-    console()
+#             elif cmd == "quit":
+#                 break
+
+#             else:
+#                 print("Unknown Command")
+#         except KeyboardInterrupt:
+#             break
+#     stop_network(True)
