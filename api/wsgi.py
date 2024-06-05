@@ -328,7 +328,23 @@ def start_route():
             ),
             200,
         )
-
+        
+        
+@app.route("/ping", methods=["GET"])
+def ping_route():
+    start = time.time()
+    for device in thread_devices:
+        device.get_ip_addr()
+        # TODO: Format this section
+        ping = ping_demo()
+        for i, device in enumerate(thread_devices):
+            print(f"{device.rloc:5}", end="")
+            for rate in ping[i]:
+                if rate == "-":
+                    print(f"{rate:5}", end="")
+                else:
+                    print(f"{rate:5}", end="")
+            print()
 
 # def console():
 #     cmd = ""
