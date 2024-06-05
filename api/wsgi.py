@@ -1,3 +1,4 @@
+import time
 import serial
 import serial.serialutil
 import serial.tools.list_ports as ports_list
@@ -21,7 +22,7 @@ CHANNEL = "15"
 FTD_TXPOWER = 0
 MTD_TXPOWER = -20
 
-DEBUG = True
+DEBUG = False
 
 
 class ot_device:
@@ -32,7 +33,7 @@ class ot_device:
         self.rloc = ""
         self.ipaddr = ""
         self.failed = False  # TODO do something with this flag
-        self.pan_id = ""
+        self.panid = ""
         self.network_key = ""
         self.channel = ""
 
@@ -115,7 +116,7 @@ def get_ports():
     return ports_l
 
 
-def link_devices():
+def link_devices(available_ports):
     print("Finding thread devices...")
     for port in available_ports:
         if os.path.exists(port) and int(re.findall(r"\d+", port)[0]) > 1:
@@ -164,16 +165,16 @@ def get_network_state(extended=False):
     for device in thread_devices:
         device_state = []
         s = "unknown"
-        device_state = device.run_command("state")
-        if "child" in device_state:
+        state = device.run_command("state")
+        if "child" in state:
             s = "child"
-        elif "disabled" in device_state:
+        elif "disabled" in state:
             s = "disabled"
-        elif "detached" in device_state:
+        elif "detached" in state:
             s = "detached"
-        elif "router" in device_state:
+        elif "router" in state:
             s = "router"
-        elif "leader" in device_state:
+        elif "leader" in state:
             s = "leader"
         device_state.append({"port": device.port})
         device_state.append({"state": s})
@@ -183,7 +184,7 @@ def get_network_state(extended=False):
             device.networkkey = device.run_command("dataset networkkey").split()[0]
             device.channel = device.run_command("dataset channel").split()[0]
             device.get_ip_addr()
-            device_state.append({"panid": device.pan_id})
+            device_state.append({"panid": device.panid})
             device_state.append({"networkkey": device.networkkey})
             device_state.append({"channel": device.channel})
             device_state.append({"ipaddr": device.ipaddr})
@@ -230,7 +231,8 @@ def rloc():
 
 
 @app.route("/config", methods=["GET", "POST"])
-def config():
+def config_route():
+    start = time.time()
     if request.method == "GET":
         if len(thread_devices) == 0:
             return (
@@ -238,16 +240,19 @@ def config():
                     isError=True,
                     message=f"Devices not started",
                     statusCode=400,
+                    responseTime=time.time() - start,
                 ),
                 400,
             )
         else:
             config_devices(1)
+            start_network()
             return (
                 jsonify(
                     isError=False,
                     message=f"{len(thread_devices)} devices configured with 1 router",
                     statusCode=200,
+                    responseTime=time.time() - start,
                 ),
                 200,
             )
@@ -258,43 +263,68 @@ def config():
                     isError=True,
                     message=f"Devices not started",
                     statusCode=400,
+                    responseTime=time.time() - start,
                 ),
                 400,
             )
         else:
             routers = request.form.get("routers")
             config_devices(routers)
+            start_network()
             return (
                 jsonify(
                     isError=False,
                     message=f"{len(thread_devices)} devices configured with {routers} router{'s' if routers > 1 else ''}",
                     statusCode=200,
+                    responseTime=time.time() - start,
                 ),
                 200,
             )
 
 
+@app.route("/stop", methods=["GET"])
+def stop_network_route():
+    start = time.time()
+    if request.method == "GET":
+        stop_network()
+        return (
+            jsonify(
+                isError=False,
+                message="Network stopped",
+                statusCode=200,
+                responseTime=time.time() - start,
+            ),
+            200,
+        )
+
+
 @app.route("/state", methods=["GET"])
-def state():
+def state_route():
+    start = time.time()
     if request.method == "GET":
         return (
             jsonify(
-                isError=False, statusCode=200, data=get_network_state(True)
+                isError=False,
+                statusCode=200,
+                data=get_network_state(True),
+                responseTime=time.time() - start,
             ),
             200,
         )
 
 
 @app.route("/start", methods=["GET"])
-def start():
+def start_route():
+    start = time.time()
     if request.method == "GET":
-        available_ports = get_ports()
-        link_devices()
+        ports = get_ports()
+        link_devices(ports)
         return (
             jsonify(
                 isError=False,
                 message=f"Serial Communication started with {len(thread_devices)} devices",
                 statusCode=200,
+                responseTime=time.time() - start,
             ),
             200,
         )
