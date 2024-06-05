@@ -21,7 +21,7 @@ CHANNEL = "15"
 FTD_TXPOWER = 0
 MTD_TXPOWER = -20
 
-DEBUG = False
+DEBUG = True
 
 
 class ot_device:
@@ -32,6 +32,9 @@ class ot_device:
         self.rloc = ""
         self.ipaddr = ""
         self.failed = False  # TODO do something with this flag
+        self.pan_id = ""
+        self.network_key = ""
+        self.channel = ""
 
     # Safely open port only if not open
     def open_port(self):
@@ -47,8 +50,8 @@ class ot_device:
     Nordic boards seem to have an issue where the input buffer gets partially rewritten
      to when running commands in quick succession, specifically after the `ot ifconfig up`
      command where it leaves `ot ifcoot` in the input buffer.
-    Probably an issue with the serial interface which I could fix, or I could just hit make
-     it run the command, nothing happen because it's unknown and carry on.
+    Probably an issue with the serial interface which I could fix, or I could just make
+     it run the command, nothing happens because it's unknown and carry on.
     """
 
     def reset_buffer(self):
@@ -156,9 +159,10 @@ def config_devices(routers=1):
 
 
 def get_network_state(extended=False):
-    network_state = ""
+    network_state = []
     rloc()
     for device in thread_devices:
+        device_state = []
         s = "unknown"
         device_state = device.run_command("state")
         if "child" in device_state:
@@ -171,28 +175,20 @@ def get_network_state(extended=False):
             s = "router"
         elif "leader" in device_state:
             s = "leader"
-        network_state += f"{device.port:15}" + " | " + device.rloc + " | " + f"{s:9}"
-        if s == "unknown":
-            print(device_state)
+        device_state.append({"port": device.port})
+        device_state.append({"state": s})
+        device_state.append({"rloc": device.rloc})
         if extended:
-            panid = device.run_command("dataset panid")
-            networkkey = device.run_command("dataset networkkey")
-            channel = device.run_command("dataset channel")
+            device.panid = device.run_command("dataset panid").split()[0]
+            device.networkkey = device.run_command("dataset networkkey").split()[0]
+            device.channel = device.run_command("dataset channel").split()[0]
             device.get_ip_addr()
-            network_info = ""
-            network_info += (
-                " | PAN ID: "
-                + panid.split()[0]
-                + " | Network Key: "
-                + networkkey.split()[0]
-                + " | Channel: "
-                + channel.split()[0]
-                + " | IP Address: "
-                + str(device.ipaddr)
-            )
-            network_state += network_info
-        network_state += "\n"
-    return network_state[:-1]  # remove trailing carriage return
+            device_state.append({"panid": device.pan_id})
+            device_state.append({"networkkey": device.networkkey})
+            device_state.append({"channel": device.channel})
+            device_state.append({"ipaddr": device.ipaddr})
+        network_state.append(device_state)
+    return network_state
 
 
 def start_network():
@@ -277,11 +273,17 @@ def config():
                 200,
             )
 
+
 @app.route("/state", methods=["GET"])
 def state():
     if request.method == "GET":
-        # TODO: Format output data
-        return
+        return (
+            jsonify(
+                isError=False, statusCode=200, data=get_network_state(True)
+            ),
+            200,
+        )
+
 
 @app.route("/start", methods=["GET"])
 def start():
@@ -296,6 +298,7 @@ def start():
             ),
             200,
         )
+
 
 # def console():
 #     cmd = ""
