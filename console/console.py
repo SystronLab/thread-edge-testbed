@@ -5,6 +5,7 @@ import re
 import os
 import sys
 import glob
+import time
 
 available_ports = []
 thread_devices = []
@@ -14,6 +15,8 @@ SLABS_PLATFORM = "EFR32"
 NETWORK_KEY = "00112233445566778899aabbccddeeff"
 PAN_ID = "0xabcd"
 CHANNEL = "15"
+
+SCAN_LENGTH = 100
 
 FTD_TXPOWER = 0
 MTD_TXPOWER = -20
@@ -29,6 +32,7 @@ class ot_device:
         self.rloc = ""
         self.ipaddr = ""
         self.failed = False  # TODO do something with this flag
+        self.rssi_dict = {str(i): "" for i in range(11, 27)}
 
     # Safely open port only if not open
     def open_port(self):
@@ -60,6 +64,10 @@ class ot_device:
         if self.platform == NRF_PLATFORM:
             command = "ot " + command
         self.serial.write(bytes(command + "\r\n", "utf-8"))
+        if "scan energy" in command:
+            time.sleep(
+                17 * SCAN_LENGTH * 0.001
+            )  # wait for the 16 channels to be scanned and then wait a further scan length
         if DEBUG:
             print("\n" + command)
         return self.get_output()
@@ -67,7 +75,7 @@ class ot_device:
     # Get output and format lines
     def get_output(self):
         self.serial.readline()
-        res = self.serial.read(1000)
+        res = self.serial.read(10000)
         if DEBUG:
             print(res.decode())
         return res.decode()
@@ -123,7 +131,7 @@ def link_devices():
                 device.platform = NRF_PLATFORM
                 thread_devices.append(device)
     for device in thread_devices:
-        print(f'{device.port:15}' + " | " + device.platform)
+        print(f"{device.port:15}" + " | " + device.platform)
 
 
 def config_devices(routers=1):
@@ -168,7 +176,7 @@ def get_network_state(extended=False):
             s = "router"
         elif "leader" in device_state:
             s = "leader"
-        network_state += f'{device.port:15}' + " | " + device.rloc + " | " + f'{s:9}'
+        network_state += f"{device.port:15}" + " | " + device.rloc + " | " + f"{s:9}"
         if s == "unknown":
             print(device_state)
         if extended:
@@ -186,6 +194,8 @@ def get_network_state(extended=False):
                 + channel.split()[0]
                 + " | IP Address: "
                 + str(device.ipaddr)
+                + " | RSSI: "
+                + device.rssi_dict[CHANNEL]
             )
             network_state += network_info
         network_state += "\n"
@@ -200,7 +210,7 @@ def start_network():
         device.ipaddr = device.get_ip_addr()
 
 
-def stop_network(full_stop = False):
+def stop_network(full_stop=False):
     for device in thread_devices:
         device.run_command("thread stop")
         device.run_command("ifconfig down")
@@ -228,6 +238,17 @@ def rloc():
         if DEBUG:
             print(device.port + " | " + rloc)
         device.rloc = rloc.split("\n")[0].strip()
+
+
+def rssi():
+    for device in thread_devices:
+        rssi_l = device.run_command("scan energy " + str(SCAN_LENGTH)).split("\n")
+        for index, key in enumerate(device.rssi_dict):
+            rssi_i = (
+                rssi_l[index + 2].find("|", rssi_l[index + 2].find("|") + 1) + 3
+            )  # +3 for the padding
+            device.rssi_dict[key] = rssi_l[index + 2][rssi_i : rssi_i + 3]
+        print(device.port + " | " + device.rloc + " | " + device.rssi_dict[CHANNEL] + "dBm")
 
 
 def console():
@@ -278,7 +299,10 @@ def console():
 
             elif "info" in cmd:
                 print(get_network_state(True))
-                
+
+            elif "rssi" in cmd:
+                rssi()
+
             elif cmd == "quit":
                 break
 
