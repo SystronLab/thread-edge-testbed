@@ -104,7 +104,9 @@ def get_ports():
     ports_l = []
     if sys.platform.startswith("win"):
         ports = list(ports_list.comports())
+        print(ports)
         for port in ports:
+            print(port)
             ports_l.append(port.name)
     elif sys.platform.startswith("linux") or sys.platform.startswith("cygwin"):
         ports_l = glob.glob("/dev/ttyACM*")
@@ -120,7 +122,7 @@ def get_ports():
 def link_devices():
     print("Finding thread devices...")
     for port in available_ports:
-        if os.path.exists(port) and int(re.findall(r"\d+", port)[0]) > 1:
+        if os.path.exists(port) and int(re.findall(r"\d+", port)[0]) > 1: 
             device = ot_device(port)
             platform = device.run_command("\r\nplatform")
             if "EFR32" in platform:
@@ -315,5 +317,6 @@ def console():
 
 if __name__ == "__main__":
     available_ports = get_ports()
+    print(available_ports)
     link_devices()
     console()

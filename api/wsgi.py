@@ -36,6 +36,7 @@ class ot_device:
         self.panid = ""
         self.network_key = ""
         self.channel = ""
+        self.rssi_dict = {str(i): "" for i in range(11, 27)}
 
     # Safely open port only if not open
     def open_port(self):
@@ -229,6 +230,16 @@ def rloc():
             print(device.port + " | " + rloc)
         device.rloc = rloc.split("\n")[0].strip()
 
+def rssi():
+    for device in thread_devices:
+        rssi_l = device.run_command("scan energy " + str(SCAN_LENGTH)).split("\n")
+        for index, key in enumerate(device.rssi_dict):
+            rssi_i = (
+                rssi_l[index + 2].find("|", rssi_l[index + 2].find("|") + 1) + 3
+            )  # +3 for the padding
+            device.rssi_dict[key] = rssi_l[index + 2][rssi_i : rssi_i + 3]
+
+
 
 @app.route("/config", methods=["GET", "POST"])
 def config_route():
@@ -329,6 +340,22 @@ def start_route():
             200,
         )
         
+@app.route("/rssi", methods=["GET"])
+def rssi_route():
+    start = time.time()
+    rssi()
+    rssi_d = {}
+    for device in thread_devices:
+        rssi_d[device.rloc] = device.rssi_dict[CHANNEL]
+    return (
+        jsonify(
+            isError=False,
+            statusCode=200,
+            responseTime=time.time() - start,
+            data=rssi_d
+        ),
+        200,
+    )
         
 @app.route("/ping", methods=["GET"])
 def ping_route():
@@ -345,52 +372,3 @@ def ping_route():
                 else:
                     print(f"{rate:5}", end="")
             print()
-
-# def console():
-#     cmd = ""
-#     while True:
-#         try:
-#             cmd = input(">")
-#             if "demo" in cmd.split()[0]:
-#                 if "ping" in cmd:
-#                     for device in thread_devices:
-#                         device.get_ip_addr()
-#                     ping = ping_demo()
-#                     print("Drop Rate between Devices")
-#                     print("     ", end="")
-#                     for device in thread_devices:
-#                         print(f"{device.rloc:4} ", end="")
-#                     print()
-#                     for i, device in enumerate(thread_devices):
-#                         print(f"{device.rloc:5}", end="")
-#                         for rate in ping[i]:
-#                             if rate == "-":
-#                                 print(f"{rate:5}", end="")
-#                             else:
-#                                 print(f"{rate:5}", end="")
-#                         print()
-
-#             elif "state" in cmd:
-#                 print(get_network_state())
-
-#             elif "start" in cmd:
-#                 print("Starting thread network...")
-#                 start_network()
-#                 print(get_network_state(True))
-
-#             elif "stop" in cmd:
-#                 print("Stopping thread network...")
-#                 stop_network()
-#                 print(get_network_state())
-
-#             elif "info" in cmd:
-#                 print(get_network_state(True))
-
-#             elif cmd == "quit":
-#                 break
-
-#             else:
-#                 print("Unknown Command")
-#         except KeyboardInterrupt:
-#             break
-#     stop_network(True)
