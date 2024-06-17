@@ -120,16 +120,20 @@ def get_ports():
 def link_devices():
     print("Finding thread devices...")
     for port in available_ports:
-        if os.path.exists(port) and int(re.findall(r"\d+", port)[0]) > 1:
-            device = ot_device(port)
-            platform = device.run_command("\r\nplatform")
-            if "EFR32" in platform:
-                device.platform = SLABS_PLATFORM
-                thread_devices.append(device)
-            platform = device.run_command("\r\not platform")
-            if "Zephyr" in platform:
-                device.platform = NRF_PLATFORM
-                thread_devices.append(device)
+        try:
+            if os.path.exists(port) and int(re.findall(r"\d+", port)[0]) > 1:
+                device = ot_device(port)
+                platform = device.run_command("\r\nplatform")
+                if "EFR32" in platform:
+                    device.platform = SLABS_PLATFORM
+                    thread_devices.append(device)
+                platform = device.run_command("\r\not platform")
+                if "Zephyr" in platform:
+                    device.platform = NRF_PLATFORM
+                    thread_devices.append(device)
+        except serial.serialutil.SerialTimeoutException:
+            pass # ignore devices that timeout
+            
     for device in thread_devices:
         print(f"{device.port:15}" + " | " + device.platform)
 
@@ -163,6 +167,7 @@ def config_devices(routers=1):
 def get_network_state(extended=False):
     network_state = ""
     rloc()
+    rssi(False)
     for device in thread_devices:
         s = "unknown"
         device_state = device.run_command("state")
@@ -240,7 +245,7 @@ def rloc():
         device.rloc = rloc.split("\n")[0].strip()
 
 
-def rssi():
+def rssi(output = True):
     for device in thread_devices:
         rssi_l = device.run_command("scan energy " + str(SCAN_LENGTH)).split("\n")
         for index, key in enumerate(device.rssi_dict):
@@ -248,7 +253,8 @@ def rssi():
                 rssi_l[index + 2].find("|", rssi_l[index + 2].find("|") + 1) + 3
             )  # +3 for the padding
             device.rssi_dict[key] = rssi_l[index + 2][rssi_i : rssi_i + 3]
-        print(device.port + " | " + device.rloc + " | " + device.rssi_dict[CHANNEL] + "dBm")
+        if output:
+            print(device.port + " | " + device.rloc + " | " + device.rssi_dict[CHANNEL] + "dBm")
 
 
 def console():
