@@ -14,9 +14,9 @@ SLABS_PLATFORM = "EFR32"
 
 NETWORK_KEY = "00112233445566778899aabbccddeeff"
 PAN_ID = "0xabcd"
-CHANNEL = "15"
+CHANNEL = "25"
 
-SCAN_LENGTH = 100
+SCAN_LENGTH = 250
 
 FTD_TXPOWER = 0
 MTD_TXPOWER = -20
@@ -254,6 +254,7 @@ def rssi(output = True):
             )  # +3 for the padding
             device.rssi_dict[key] = rssi_l[index + 2][rssi_i : rssi_i + 3]
         if output:
+            # print(device.rssi_dict)
             print(device.port + " | " + device.rloc + " | " + device.rssi_dict[CHANNEL] + "dBm")
 
 
@@ -316,7 +317,7 @@ def console():
                 print("Unknown Command")
         except KeyboardInterrupt:
             break
-    stop_network(True)
+    # stop_network(True)
 
 
 if __name__ == "__main__":
