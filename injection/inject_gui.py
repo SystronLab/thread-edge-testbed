@@ -13,8 +13,6 @@ import tkinter.font as tkFont
 
 '''
 
-run_attack = True
-
 # These are the same parameters as on the web interface
 CHANNEL_DEFAULT = 15
 IFS_DEFAULT = 1 # ms
@@ -89,7 +87,7 @@ title_frame = tk.Frame(root, padx=10, pady=10)
 title_frame.pack(fill=tk.X)
 
 # Create and pack the title label
-title_label = tk.Label(title_frame, text="Control Panel", font=("Helvetica", 16))
+title_label = tk.Label(title_frame, text="Start and Stop Thread DoS Attack", font=("Helvetica", 16))
 title_label.pack(fill=tk.X)
 
 # Define fonts for the buttons
