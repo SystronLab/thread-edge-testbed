@@ -60,13 +60,17 @@ print("OpenSniffer command tool")
 print("------------------------")
 print("channel = %d, ifs = %d ms, packet size = %d bytes, repeat = %d" % (chn, tspace, packetlen, nrepeat))
 state = "run"
-
+        
 def handle_stop_press():
-    print("STOP")
     r = requests.get(url = STATUS_URL, params = "p=0")
 
 def handle_start_press():    
-    print("START")
+    ifs = ifs_var.get()
+    try:
+        ifs = int(ifs)
+    except:
+        ifs = IFS_DEFAULT
+    PARAMS['tspace'] = ifs
     r = requests.get(url = INJECT_URL, params = PARAMS)
     if(r.status_code != 200):
         exit()
@@ -82,6 +86,8 @@ def resize_font(event):
 root = tk.Tk()
 root.title("Thread DoS Attack")
 
+ifs_var = tk.StringVar()
+
 # Create a frame for the title
 title_frame = tk.Frame(root, padx=10, pady=10)
 title_frame.pack(fill=tk.X)
@@ -93,6 +99,11 @@ title_label.pack(fill=tk.X)
 # Define fonts for the buttons
 start_font = tkFont.Font(family="Helvetica", size=20)
 stop_font = tkFont.Font(family="Helvetica", size=20)
+
+ifs_label = tk.Label(root, text="Interframe Spacing (ms):", font=start_font)
+ifs_entry = tk.Entry(root, textvariable=ifs_var, font=start_font)
+ifs_label.pack()
+ifs_entry.pack()
 
 # Create a frame to hold the buttons with padding
 button_frame = tk.Frame(root, padx=10, pady=10)
