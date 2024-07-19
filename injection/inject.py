@@ -12,12 +12,12 @@ import sys
 
 '''
 
-
 # These are the same parameters as on the web interface
 CHANNEL_DEFAULT = 15
 IFS_DEFAULT = 1 # ms
 NREPEAT_DEFAULT = 500000 # 2436 seconds worth
 
+IPV4_ADDR = "10.10.10.2"
 
 chn = CHANNEL_DEFAULT
 modul = 0
@@ -93,18 +93,19 @@ PARAMS = {'chn': chn,
           'spayload' : spayload,
           'len': packetlen}
 
-INJECT_URL = "http://10.10.10.2/inject.cgi"
-STATUS_URL = "http://10.10.10.2/status.cgi"
+INJECT_URL = f"http://{IPV4_ADDR}/inject.cgi"
+STATUS_URL = f"http://{IPV4_ADDR}/status.cgi"
 
 print("OpenSniffer command tool")
 print("------------------------")
 print("channel = %d, ifs = %d ms, packet size = %d bytes, repeat = %d" % (chn, tspace, packetlen, nrepeat))
 state = "run"
 r = requests.get(url = INJECT_URL, params = PARAMS)
+print(r)
 if(r.status_code != 200):
     exit()
 print("transmitting...")
-          
+
 while True:
     if(state=="run"):
         r = input("$ stop transmitting? (y/n):")
