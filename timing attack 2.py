@@ -338,6 +338,9 @@ def console():
             elif "rssi" in cmd:
                 rssi()
 
+            elif "timing" in cmd:
+                timing_attack_demo()
+
             elif cmd == "quit":
                 break
 
