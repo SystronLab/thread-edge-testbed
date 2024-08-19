@@ -117,7 +117,8 @@ def timing_attack_demo():
     for device in thread_devices:
         for receiver in thread_devices:
             if device != receiver:
-                _, drop_rate = device.ping(receiver.ipaddr)  # Removed elapsed_time
+                # Only retrieve the drop_rate, ignore elapsed_time using '_'
+                _, drop_rate = device.ping(receiver.ipaddr)
                 timing_results.append((device.port, receiver.port, drop_rate))
 
     # Output results
@@ -134,16 +135,20 @@ def timing_attack_demo():
 
 def analyze_timing(results):
     # Analyze drop rates and identify anomalies
-    average_drop_rate = sum([float(res[2]) for res in results if res[2] != 'err']) / len(results)
-    print(f"\nAverage Drop Rate: {average_drop_rate:.2f}%")
+    drop_rates = [float(res[2]) for res in results if res[2] != 'err']
+    if drop_rates:
+        average_drop_rate = sum(drop_rates) / len(drop_rates)
+        print(f"\nAverage Drop Rate: {average_drop_rate:.2f}%")
 
-    anomalies = [res for res in results if res[2] != 'err' and abs(float(res[2]) - average_drop_rate) > 10]  # Example threshold
-    if anomalies:
-        print("\nPotential Anomalies Detected in Drop Rates:")
-        for anomaly in anomalies:
-            print(f"From {anomaly[0]} to {anomaly[1]}: Drop Rate: {anomaly[2]}")
+        anomalies = [res for res in results if res[2] != 'err' and abs(float(res[2]) - average_drop_rate) > 10]  # Example threshold
+        if anomalies:
+            print("\nPotential Anomalies Detected in Drop Rates:")
+            for anomaly in anomalies:
+                print(f"From {anomaly[0]} to {anomaly[1]}: Drop Rate: {anomaly[2]}")
+        else:
+            print("No significant anomalies detected.")
     else:
-        print("No significant anomalies detected.")
+        print("No valid drop rates found for analysis.")
 
 # Flask routes (modified to include timing attack)
 @app.route("/timing_attack", methods=["GET"])
