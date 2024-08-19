@@ -113,12 +113,7 @@ def link_devices(available_ports):
 
 # Function to run the timing attack
 
-import re
-
-class ot_device:
-    # Other methods remain unchanged
-
-    def ping(self, address):
+def ping(self, address):
         res = self.run_command("ping " + address)
         res_arr = res.split(" ")
         try:
