@@ -113,25 +113,29 @@ def link_devices(available_ports):
 
 # Function to run the timing attack
 
-def ping(self, address):
-        # Timing measurement removed; only drop_rate is processed
+import re
+
+class ot_device:
+    # Other methods remain unchanged
+
+    def ping(self, address):
         res = self.run_command("ping " + address)
         res_arr = res.split(" ")
         try:
             drop_rate = str(
                 re.findall("\d+\.\d+", res_arr[res_arr.index("Packet") + 3])[0]
             )
-            return None, drop_rate
+            return drop_rate  # Return only drop_rate
         except:
-            return None, "err"  # Return "err" if parsing fails
+            return "err"  # Return "err" if parsing fails
 
 def timing_attack_demo():
     timing_results = []
     for device in thread_devices:
         for receiver in thread_devices:
             if device != receiver:
-                _, drop_rate = device.ping(receiver.ipaddr)
-                # Handle NoneType by ensuring drop_rate is always a string
+                drop_rate = device.ping(receiver.ipaddr)  # Now handles only one return value
+                # Ensure drop_rate is always a string
                 if drop_rate is None:
                     drop_rate = "err"
                 timing_results.append((device.port, receiver.port, drop_rate))
@@ -139,8 +143,8 @@ def timing_attack_demo():
     # Output results
     print("\nTiming Attack Results:")
     for result in timing_results:
-        # Adding a safeguard to check tuple length before accessing elements
-        if len(result) >= 3:
+        # Safeguard to check tuple length before accessing elements
+        if len(result) == 3:
             print(f"From {result[0]} to {result[1]}: Drop Rate: {result[2]}")
         else:
             print(f"Incomplete data in result: {result}")
