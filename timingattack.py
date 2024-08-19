@@ -117,31 +117,33 @@ def timing_attack_demo():
     for device in thread_devices:
         for receiver in thread_devices:
             if device != receiver:
-                elapsed_time, drop_rate = device.ping(receiver.ipaddr)
-                timing_results.append((device.port, receiver.port, elapsed_time, drop_rate))
+                _, drop_rate = device.ping(receiver.ipaddr)  # Removed elapsed_time
+                timing_results.append((device.port, receiver.port, drop_rate))
 
     # Output results
     print("\nTiming Attack Results:")
     for result in timing_results:
-        print(f"From {result[0]} to {result[1]}: {result[2]:.6f} seconds, Drop Rate: {result[3]}")
+        # Adding a safeguard to check tuple length before accessing elements
+        if len(result) >= 3:
+            print(f"From {result[0]} to {result[1]}: Drop Rate: {result[2]}")
+        else:
+            print(f"Incomplete data in result: {result}")
 
     # Analyze and identify anomalies
     analyze_timing(timing_results)
 
-
-# Analyze timing results to detect potential timing anomalies
 def analyze_timing(results):
-    average_time = sum([res[2] for res in results]) / len(results)
-    print(f"\nAverage Response Time: {average_time:.6f} seconds")
+    # Analyze drop rates and identify anomalies
+    average_drop_rate = sum([float(res[2]) for res in results if res[2] != 'err']) / len(results)
+    print(f"\nAverage Drop Rate: {average_drop_rate:.2f}%")
 
-    anomalies = [res for res in results if abs(res[2] - average_time) > 0.01]  # Example threshold
+    anomalies = [res for res in results if res[2] != 'err' and abs(float(res[2]) - average_drop_rate) > 10]  # Example threshold
     if anomalies:
-        print("\nPotential Timing Anomalies Detected:")
+        print("\nPotential Anomalies Detected in Drop Rates:")
         for anomaly in anomalies:
-            print(f"From {anomaly[0]} to {anomaly[1]}: {anomaly[2]:.6f} seconds, Drop Rate: {anomaly[3]}")
+            print(f"From {anomaly[0]} to {anomaly[1]}: Drop Rate: {anomaly[2]}")
     else:
-        print("No significant timing anomalies detected.")
-
+        print("No significant anomalies detected.")
 
 # Flask routes (modified to include timing attack)
 @app.route("/timing_attack", methods=["GET"])
