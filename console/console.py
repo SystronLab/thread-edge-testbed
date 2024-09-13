@@ -5,6 +5,7 @@ import re
 import os
 import sys
 import glob
+import time
 
 available_ports = []
 thread_devices = []
@@ -177,16 +178,19 @@ def get_network_state(extended=False):
             channel = device.run_command("dataset channel")
             device.get_ip_addr()
             network_info = ""
-            network_info += (
-                " | PAN ID: "
-                + panid.split()[0]
-                + " | Network Key: "
-                + networkkey.split()[0]
-                + " | Channel: "
-                + channel.split()[0]
-                + " | IP Address: "
-                + str(device.ipaddr)
-            )
+            try:
+                network_info += (
+                    " | PAN ID: "
+                    + panid.split()[0]
+                    + " | Network Key: "
+                    + networkkey.split()[0]
+                    + " | Channel: "
+                    + channel.split()[0]
+                    + " | IP Address: "
+                    + str(device.ipaddr)
+                )
+            except:
+                pass
             network_state += network_info
         network_state += "\n"
     return network_state[:-1]  # remove trailing carriage return
@@ -221,6 +225,15 @@ def ping_demo():
         res.append(dev_res)
     return res
 
+def ping_loop():
+    while True:
+        for device in thread_devices:
+            for receiver in thread_devices:
+                if device == receiver:
+                    pass
+                else:
+                    device.ping(receiver.ipaddr)
+
 
 def rloc():
     for device in thread_devices:
@@ -237,22 +250,28 @@ def console():
             cmd = input(">")
             if "demo" in cmd.split()[0]:
                 if "ping" in cmd:
-                    for device in thread_devices:
-                        device.get_ip_addr()
-                    ping = ping_demo()
-                    print("Drop Rate between Devices")
-                    print("     ", end="")
-                    for device in thread_devices:
-                        print(f"{device.rloc:4} ", end="")
-                    print()
-                    for i, device in enumerate(thread_devices):
-                        print(f"{device.rloc:5}", end="")
-                        for rate in ping[i]:
-                            if rate == "-":
-                                print(f"{rate:5}", end="")
-                            else:
-                                print(f"{rate:5}", end="")
-                        print()
+                    if "loop" in cmd:
+                        ping_loop()
+                    else:
+                        # TEMP LOOP
+                        while True:
+                            for device in thread_devices:
+                                device.get_ip_addr()
+                            ping = ping_demo()
+                            print("Drop Rate between Devices")
+                            print("     ", end="")
+                            for device in thread_devices:
+                                print(f"{device.rloc:4} ", end="")
+                            print()
+                            for i, device in enumerate(thread_devices):
+                                print(f"{device.rloc:5}", end="")
+                                for rate in ping[i]:
+                                    if rate == "-":
+                                        print(f"{rate:5}", end="")
+                                    else:
+                                        print(f"{rate:5}", end="")
+                                print()
+                            # time.sleep(5)
 
             elif "config" in cmd:
                 number = 1
@@ -286,7 +305,7 @@ def console():
                 print("Unknown Command")
         except KeyboardInterrupt:
             break
-    stop_network(True)
+    # stop_network(True)
 
 
 if __name__ == "__main__":
