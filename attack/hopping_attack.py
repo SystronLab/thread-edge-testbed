@@ -8,7 +8,7 @@ import glob
 import time
 
 available_ports = []
-thread_devices = []
+thread_device = None
 NRF_PLATFORM = "Zephyr"
 SLABS_PLATFORM = "EFR32"
 
@@ -82,4 +82,40 @@ class ot_device:
                 self.ipaddr = ipaddr.strip()
     
     def scan_network(self):
-        pass
+        scan = self.run_command("scan").split("\n")
+        print(scan)
+        
+# Get available COM ports
+def get_ports():
+    ports_l = []
+    if sys.platform.startswith("win"):
+        ports = list(ports_list.comports())
+        for port in ports:
+            ports_l.append(port.name)
+    elif sys.platform.startswith("linux") or sys.platform.startswith("cygwin"):
+        ports_l = glob.glob("/dev/ttyACM*")
+    else:
+        print("No available ports found")
+    if len(ports_l):
+        print("\n" + str(len(ports_l)) + " serial connections found")
+        if DEBUG:
+            print(ports_l)
+    return ports_l
+
+
+def link_devices():
+    print("Finding thread devices...")
+    for port in available_ports:
+        try:
+            if os.path.exists(port) and int(re.findall(r"\d+", port)[0]) > 1:
+                device = ot_device(port)
+                platform = device.run_command("\r\nplatform")
+                if "EFR32" in platform:
+                    device.platform = SLABS_PLATFORM
+                    thread_device = device
+                platform = device.run_command("\r\not platform")
+                if "Zephyr" in platform:
+                    device.platform = NRF_PLATFORM
+                    thread_device = device
+        except serial.serialutil.SerialTimeoutException:
+            pass # ignore devices that timeout
