@@ -14,7 +14,7 @@ import tkinter.font as tkFont
 '''
 
 # These are the same parameters as on the web interface
-CHANNEL_DEFAULT = 15
+CHANNEL_DEFAULT = 11
 IFS_DEFAULT = 1 # ms
 NREPEAT_DEFAULT = 500000 # 2436 seconds worth
 
@@ -22,7 +22,7 @@ IPV4_ADDR = "10.10.10.2"
 
 chn = CHANNEL_DEFAULT
 modul = 0
-txlevel = 0 #  '0' equiv. to +3dBm
+txlevel = 0 #  '0' equiv. to +3dBm '0xD'/13 equiv. to -9dBm
 rxen = 0
 nrepeat = NREPEAT_DEFAULT
 #nrepeat = 800 
@@ -55,25 +55,35 @@ PARAMS = {'chn': chn,
 
 INJECT_URL = f"http://{IPV4_ADDR}/inject.cgi"
 STATUS_URL = f"http://{IPV4_ADDR}/status.cgi"
-
-print("OpenSniffer command tool")
-print("------------------------")
-print("channel = %d, ifs = %d ms, packet size = %d bytes, repeat = %d" % (chn, tspace, packetlen, nrepeat))
-state = "run"
+        
+### BUTTON HANDLING ###
         
 def handle_stop_press():
     r = requests.get(url = STATUS_URL, params = "p=0")
+    stop_button.configure(bg='grey')
+    start_button.configure(bg='green')
 
 def handle_start_press():    
+    stop_button.configure(bg='red')
+    start_button.configure(bg='grey')
+    
     ifs = ifs_var.get()
+    channel = channel_var.get()
+    
     try:
         ifs = int(ifs)
+        channel = int(channel)
     except:
         ifs = IFS_DEFAULT
+        channel = CHANNEL_DEFAULT
     PARAMS['tspace'] = ifs
+    PARAMS['chn'] = channel
+    
     r = requests.get(url = INJECT_URL, params = PARAMS)
     if(r.status_code != 200):
         exit()
+        
+### GUI ###
         
 # Function to resize font based on button size
 def resize_font(event):
@@ -87,23 +97,31 @@ root = tk.Tk()
 root.title("Thread DoS Attack")
 
 ifs_var = tk.StringVar()
+channel_var = tk.StringVar()
 
 # Create a frame for the title
 title_frame = tk.Frame(root, padx=10, pady=10)
 title_frame.pack(fill=tk.X)
 
 # Create and pack the title label
-title_label = tk.Label(title_frame, text="Start and Stop Thread DoS Attack", font=("Helvetica", 16))
+title_label = tk.Label(title_frame, text="Start and Stop Thread DoS Attack", font=("Helvetica", 40))
 title_label.pack(fill=tk.X)
 
 # Define fonts for the buttons
 start_font = tkFont.Font(family="Helvetica", size=20)
 stop_font = tkFont.Font(family="Helvetica", size=20)
+ifs_font = tkFont.Font(family="Helvetica", size=20)
+channel_font = tkFont.Font(family="Helvetica", size=20)
 
-ifs_label = tk.Label(root, text="Interframe Spacing (ms):", font=start_font)
-ifs_entry = tk.Entry(root, textvariable=ifs_var, font=start_font)
+ifs_label = tk.Label(root, text="Interframe Spacing (ms):", font=ifs_font)
+ifs_entry = tk.Entry(root, textvariable=ifs_var, font=ifs_font)
 ifs_label.pack()
 ifs_entry.pack()
+
+channel_label = tk.Label(root, text="Channel:", font=channel_font)
+channel_entry = tk.Entry(root, textvariable=channel_var, font=channel_font)
+channel_label.pack()
+channel_entry.pack()
 
 # Create a frame to hold the buttons with padding
 button_frame = tk.Frame(root, padx=10, pady=10)
@@ -120,6 +138,8 @@ stop_button.pack(side=tk.RIGHT, expand=True, fill=tk.BOTH, padx=5, pady=5)
 # Bind the resize event to adjust the font size dynamically
 start_button.bind("<Configure>", resize_font)
 stop_button.bind("<Configure>", resize_font)
+ifs_label.bind("<Configure>", resize_font)
+channel_label.bind("<Configure>", resize_font)
 
 # Start the Tkinter event loop
 root.mainloop()     
