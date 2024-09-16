@@ -7,19 +7,7 @@ import sys
 import glob
 import time
 
-available_ports = []
-thread_device = None
-NRF_PLATFORM = "Zephyr"
-SLABS_PLATFORM = "EFR32"
-
-NETWORK_KEY = "00112233445566778899aabbccddeeff"
-PAN_ID = "0xabcd"
-CHANNEL = "25"
-
-SCAN_LENGTH = 250
-
-FTD_TXPOWER = 0
-MTD_TXPOWER = -20
+SUB_STRINGS =  ["\x1b[1;32muart:~$", "\x1b[m\x1b[8D\x1b[J'", "\x1b[m']"]
 
 DEBUG = False
 
@@ -27,29 +15,6 @@ class ot_device:
     def __init__(self, port):
         self.port = port  # COM Port
         self.serial = serial.Serial(self.port, 115200, timeout=0.1, write_timeout=1.0)
-        self.platform = ""  # zephyr or efr32
-        self.rloc = ""
-        self.ipaddr = ""
-        self.failed = False  # TODO do something with this flag
-        self.rssi_dict = {str(i): "" for i in range(11, 27)}
-
-    # Safely open port only if not open
-    def open_port(self):
-        if not self.serial.is_open:
-            self.serial.open()
-
-    # Safely close port only if open
-    def close_port(self):
-        if self.serial.is_open:
-            self.serial.close()
-
-    """
-    Nordic boards seem to have an issue where the input buffer gets partially rewritten
-     to when running commands in quick succession, specifically after the `ot ifconfig up`
-     command where it leaves `ot ifcoot` in the input buffer.
-    Probably an issue with the serial interface which I could fix, or I could just hit make
-     it run the command, nothing happen because it's unknown and carry on.
-    """
 
     def reset_buffer(self):
         self.serial.write(bytes("\r\n", "utf-8"))
@@ -60,8 +25,6 @@ class ot_device:
     # Run command and return formatted output
     def run_command(self, command):
         self.reset_buffer()
-        if self.platform == NRF_PLATFORM:
-            command = "ot " + command
         self.serial.write(bytes(command + "\r\n", "utf-8"))
         if DEBUG:
             print("\n" + command)
@@ -74,16 +37,15 @@ class ot_device:
         if DEBUG:
             print(res.decode())
         return res.decode()
-
-    def get_ip_addr(self):
-        ipaddr_res = self.run_command("ipaddr").split("\n")
-        for ipaddr in ipaddr_res:
-            if ipaddr.strip()[-4:] == self.rloc:
-                self.ipaddr = ipaddr.strip()
     
     def scan_network(self):
-        scan = self.run_command("scan").split("\n")
-        print(scan)
+        self.reset_buffer()
+        self.serial.write(b"ot scan\r\n")
+        headers = self.get_output() # First output is the headers
+        time.sleep(4.8)
+        res = self.serial.read_all().decode()
+        return res
+        
         
 # Get available COM ports
 def get_ports():
@@ -102,20 +64,47 @@ def get_ports():
             print(ports_l)
     return ports_l
 
-
-def link_devices():
+def link_device(available_ports):
     print("Finding thread devices...")
     for port in available_ports:
         try:
             if os.path.exists(port) and int(re.findall(r"\d+", port)[0]) > 1:
                 device = ot_device(port)
-                platform = device.run_command("\r\nplatform")
-                if "EFR32" in platform:
-                    device.platform = SLABS_PLATFORM
-                    thread_device = device
                 platform = device.run_command("\r\not platform")
                 if "Zephyr" in platform:
-                    device.platform = NRF_PLATFORM
-                    thread_device = device
+                    return device
         except serial.serialutil.SerialTimeoutException:
             pass # ignore devices that timeout
+
+def get_open_networks(thread_device):
+    scan = thread_device.scan_network()
+    networks = []
+    for entry in scan.split('\n')[:-2]:
+        entry = list(filter(None, ''.join(letter for letter in ''.join(entry.split('|')) if letter.isalnum()).replace('8DJ', '').replace('132muartm', ' ').split(' ')))
+        network = {
+            "pan": entry[0],
+            "mac_addr": ''.join(entry[1:8]),
+            "ch": entry[9],
+            "dbm": int(entry[10]) * -1,
+            "lqi": int(entry[11])
+        }
+        networks.append(network)
+    return networks
+        
+ports = get_ports()
+thread_device = link_device(ports)
+networks = get_open_networks(thread_device)
+print(networks)
+"""
+get ports
+thread_device = link devices
+Poll State every 5 seconds
+Once state != detached or disabled and is a valid state...
+MAIN LOOP - run every n seconds
+Nordic Board:
+ - Run scan command
+ - If any thread networks present get what channel they are on
+ Open Sniffer:
+ - Run attack on given channel
+ - When channel is updated switch to that channel
+"""
