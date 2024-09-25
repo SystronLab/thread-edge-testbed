@@ -9,6 +9,10 @@ import time
 
 SUB_STRINGS =  ["\x1b[1;32muart:~$", "\x1b[m\x1b[8D\x1b[J'", "\x1b[m']"]
 
+IPV4_ADDR = "10.10.10.2"
+
+INJECT_URL = f"http://{IPV4_ADDR}/inject.cgi"
+
 DEBUG = False
 
 class ot_device:
@@ -91,10 +95,12 @@ def get_open_networks(thread_device):
         networks.append(network)
     return networks
         
+def attack_channel(channel):
+    pass
+        
 ports = get_ports()
 thread_device = link_device(ports)
 networks = get_open_networks(thread_device)
-print(networks)
 """
 get ports
 thread_device = link devices
