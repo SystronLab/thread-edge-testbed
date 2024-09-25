@@ -10,8 +10,9 @@ import time
 SUB_STRINGS =  ["\x1b[1;32muart:~$", "\x1b[m\x1b[8D\x1b[J'", "\x1b[m']"]
 
 IPV4_ADDR = "10.10.10.2"
-
 INJECT_URL = f"http://{IPV4_ADDR}/inject.cgi"
+
+channel = '15' # Default value
 
 DEBUG = False
 
@@ -72,11 +73,10 @@ def link_device(available_ports):
     print("Finding thread devices...")
     for port in available_ports:
         try:
-            if os.path.exists(port) and int(re.findall(r"\d+", port)[0]) > 1:
-                device = ot_device(port)
-                platform = device.run_command("\r\not platform")
-                if "Zephyr" in platform:
-                    return device
+            device = ot_device(port)
+            platform = device.run_command("\r\not platform")
+            if "Zephyr" in platform:
+                return device
         except serial.serialutil.SerialTimeoutException:
             pass # ignore devices that timeout
 
@@ -94,6 +94,13 @@ def get_open_networks(thread_device):
         }
         networks.append(network)
     return networks
+
+def choose_channel(networks):
+    strongest_channel = [networks[0]['ch'], networks[0]['dbm']]
+    for network in networks:
+        if network['dbm'] > strongest_channel[1]:
+            strongest_channel = [network['ch'], network['dbm']]
+    return strongest_channel[0]
         
 def attack_channel(channel):
     pass
@@ -101,6 +108,10 @@ def attack_channel(channel):
 ports = get_ports()
 thread_device = link_device(ports)
 networks = get_open_networks(thread_device)
+channel = choose_channel(networks)
+
+# TODO: setup function to set opensniffer to attack a given channel
+
 """
 get ports
 thread_device = link devices

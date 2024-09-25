@@ -107,7 +107,7 @@ def get_ports():
         for port in ports:
             ports_l.append(port.name)
     elif sys.platform.startswith("linux") or sys.platform.startswith("cygwin"):
-        ports_l = glob.glob("/dev/ttyACM*")
+        ports_l = glob.glob("/dev/ttyACM1")
     else:
         print("No available ports found")
     if len(ports_l):
