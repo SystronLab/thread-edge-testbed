@@ -1,3 +1,0 @@
-1 load data
-2 decode data into ascii from hex
-3 
