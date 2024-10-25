@@ -130,3 +130,5 @@ def multiple_scan_jamming():
         networks = get_open_networks(thread_device)
         channel = choose_channel(networks)
         attack_channel(channel)
+        
+single_scan_jamming()
