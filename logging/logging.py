@@ -21,6 +21,7 @@ class ot_device:
         self.serial = serial.Serial(self.port, 115200, timeout=0.1, write_timeout=1.0)
         self.rloc = ""
         self.platform = ""
+        self.log = ""
 
     # Safely open port only if not open
     def open_port(self):
@@ -99,8 +100,14 @@ def link_devices():
             
     for device in thread_devices:
         print(f"{device.port:5}" + " | " + device.platform)
-        
-        
+
+def rloc():
+    for device in thread_devices:
+        rloc = device.run_command("ot rloc16")
+        if DEBUG:
+            print(device.port + " | " + rloc)
+        device.rloc = rloc.split("\n")[0].strip()        
+ 
 def clear_logs():
     for device in thread_devices:
         device.run_command("testbed clearlog")
@@ -110,18 +117,32 @@ def get_dump_log():
         device.serial.write(bytes("testbed dumprawlog" + "\r\n", "utf-8"))
         device.serial.readline()
         rawlog = device.serial.read(10000).decode()
-        print(rawlog)
-        
+        device.log = rawlog
+
+def parse_log():
+    for device in thread_devices:
+        log_array = device.log.split(' ')
+        filtered_log_array = [string.strip() for string in log_array if len(string.strip()) == 2]
+        filtered_log = ''.join(filtered_log_array)
+        byte_data = bytes.fromhex(filtered_log)
+        log_data = byte_data.decode('ascii', errors='ignore')
+        print(log_data)
+    
 def console():
-    while True:
-        cmd = input(">")
-        if cmd == "clear":
-            clear_logs()
-        if cmd == "log":
-            get_dump_log()
+    try:
+        while True:
+            cmd = input(">")
+            if cmd == "clear":
+                clear_logs()
+            if cmd == "log":
+                get_dump_log()
+                parse_log()
+    except KeyboardInterrupt:
+        pass
             
 
 if __name__ == "__main__":
     available_ports = get_ports()
     link_devices()
+    rloc()
     console()
