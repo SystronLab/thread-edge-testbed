@@ -6,6 +6,7 @@ import os
 import sys
 import glob
 import time
+import struct
 
 available_ports = []
 thread_devices = []
@@ -80,6 +81,42 @@ def get_ports():
             print(ports_l)
     return ports_l
 
+def decode_packets(hex_log):
+    # Convert hex string to bytes
+    packet_bytes = bytes.fromhex(hex_log)
+    
+    # Define the struct format for a single 32-byte packetData struct
+    struct_format = '>HHHBB24s'
+    struct_size = struct.calcsize(struct_format)
+    
+    # Verify if the hex log length is a multiple of the struct size
+    if len(packet_bytes) % struct_size != 0:
+        raise ValueError("Hex log length is not a multiple of the expected struct size (32 bytes).")
+    
+    packets = []
+    
+    # Process each 32-byte chunk in the hex log
+    for i in range(0, len(packet_bytes), struct_size):
+        # Extract the 32-byte chunk
+        packet_chunk = packet_bytes[i:i + struct_size]
+        
+        # Unpack the chunk
+        unpacked_data = struct.unpack(struct_format, packet_chunk)
+        
+        # Map the unpacked data to struct fields
+        packet_data = {
+            'deviceId': unpacked_data[0],
+            'deviceFunctions': unpacked_data[1],
+            'packetCount': unpacked_data[2],
+            'deviceType': unpacked_data[3],
+            'dataLen': unpacked_data[4],
+            'data': unpacked_data[5]
+        }
+        
+        packets.append(packet_data)
+    
+    return packets
+
 
 def link_devices():
     print("Finding thread devices...")
@@ -125,10 +162,8 @@ def parse_log():
         log_array = device.log.split(' ')
         filtered_log_array = [string.strip() for string in log_array if len(string.strip()) == 2]
         filtered_log = ''.join(filtered_log_array)
-        print(filtered_log)
-        byte_data = bytes.fromhex(filtered_log)
-        log_data = byte_data.decode('ascii', errors='ignore')
-        print(log_data)
+        struct_data = decode_packets(filtered_log)
+        print(struct_data)
     
 def console():
     try:
