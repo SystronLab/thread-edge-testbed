@@ -16,10 +16,13 @@ SLABS_PLATFORM = "EFR32"
 
 DEBUG = False
 
+MIN_PACKET_SIZE = 8
+MAX_PACKET_SIZE = 32
+
 class ot_device:
     def __init__(self, port):
         self.port = port  # COM Port
-        self.serial = serial.Serial(self.port, 115200, timeout=0.1, write_timeout=1.0)
+        self.serial = serial.Serial(self.port, 115200, timeout=0.5, write_timeout=1.0)
         self.rloc = ""
         self.platform = ""
         self.log = ""
@@ -82,40 +85,87 @@ def get_ports():
     return ports_l
 
 def decode_packets(hex_log):
-    # Convert hex string to bytes
-    packet_bytes = bytes.fromhex(hex_log)
+# Convert hex string to bytes
+    log_bytes = bytes.fromhex(hex_log)
     
-    # Define the struct format for a single 32-byte packetData struct
-    struct_format = '>HHHBB24s'
-    struct_size = struct.calcsize(struct_format)
+    # Define the struct format for a single 32-byte packetData
+    packet_format = '>HHHBB24s'
+    packet_size = struct.calcsize(packet_format)
     
-    # Verify if the hex log length is a multiple of the struct size
-    if len(packet_bytes) % struct_size != 0:
-        raise ValueError("Hex log length is not a multiple of the expected struct size (32 bytes).")
-    
+    # Define constant sizes for fields
+    HEADER_SIZE = 8  # for Message Log Format
     packets = []
     
-    # Process each 32-byte chunk in the hex log
-    for i in range(0, len(packet_bytes), struct_size):
-        # Extract the 32-byte chunk
-        packet_chunk = packet_bytes[i:i + struct_size]
+    # Process each 32-byte packetData struct in the log
+    for i in range(0, len(log_bytes), packet_size):
+        if i + packet_size > len(log_bytes):  # Stop if remaining bytes are less than 32
+            break
+            
+        # Extract the 32-byte packetData chunk
+        packet_chunk = log_bytes[i:i + packet_size]
         
-        # Unpack the chunk
-        unpacked_data = struct.unpack(struct_format, packet_chunk)
+        # Unpack the packetData chunk
+        unpacked_packet = struct.unpack(packet_format, packet_chunk)
         
-        # Map the unpacked data to struct fields
-        packet_data = {
-            'deviceId': unpacked_data[0],
-            'deviceFunctions': unpacked_data[1],
-            'packetCount': unpacked_data[2],
-            'deviceType': unpacked_data[3],
-            'dataLen': unpacked_data[4],
-            'data': unpacked_data[5]
-        }
+        # Map unpacked values to packet fields
+        device_id = unpacked_packet[0]
+        device_functions = unpacked_packet[1]
+        packet_count = unpacked_packet[2]
+        device_type = unpacked_packet[3]
+        data_len = unpacked_packet[4]
+        data_bytes = unpacked_packet[5][:data_len]  # Only consider `dataLen` bytes of `data`
         
-        packets.append(packet_data)
+        # Determine log type identifier
+        log_type_identifier = data_bytes[0:1].decode(errors='ignore') if data_bytes else None
+        
+        # Decode the `data` field based on the log type identifier
+        message_data = {}
+        
+        if log_type_identifier == 'M' and len(data_bytes) >= HEADER_SIZE:
+            # Message Log Format
+            message_string = ""
+            try:
+                message_string = data_bytes[8:data_bytes.find(b'\x00', 8)].decode() if b'\x00' in data_bytes[8:] else ""
+            except UnicodeDecodeError:
+                message_string = "<Undecodable Message String>"
+            
+            message_data = {
+                'logTypeIdentifier': 'M',
+                'cpuTime': int.from_bytes(data_bytes[2:6], 'little'),
+                'linkShortAddress': int.from_bytes(data_bytes[6:8], 'little'),
+                'messageString': message_string
+            }
+        
+        elif log_type_identifier == 'R' and len(data_bytes) >= 6:
+            # Received Packet Format
+            message_data = {
+                'logTypeIdentifier': 'R',
+                'deviceState': data_bytes[1],
+                'cpuTime': int.from_bytes(data_bytes[2:6], 'little'),
+                'receivedPacket': data_bytes[6:]  # Keep as bytes to avoid decoding issues
+            }
+        
+        elif log_type_identifier == 'T' and len(data_bytes) >= 6:
+            # Transmitted Packet Format
+            message_data = {
+                'logTypeIdentifier': 'T',
+                'deviceState': data_bytes[1],
+                'cpuTime': int.from_bytes(data_bytes[2:6], 'little'),
+                'transmittedPacket': data_bytes[6:]  # Keep as bytes to avoid decoding issues
+            }
+        
+        # Store packet data along with the parsed message log information
+        packets.append({
+            'deviceId': device_id,
+            'deviceFunctions': device_functions,
+            'packetCount': packet_count,
+            'deviceType': device_type,
+            'dataLen': data_len,
+            'messageData': message_data
+        })
     
     return packets
+
 
 
 def link_devices():
@@ -151,10 +201,11 @@ def clear_logs():
         
 def get_dump_log():
     for device in thread_devices:
-        device.serial.write(bytes("testbed dumprawlog" + "\r\n", "utf-8"))
+        device.serial.write(bytes("testbed dumprawlog" + "\r\n", "ascii"))
         device.serial.readline()
         rawlog = device.serial.read(10000).decode()
         device.log = rawlog
+        print(rawlog)
 
 def parse_log():
     for device in thread_devices:
@@ -163,7 +214,8 @@ def parse_log():
         filtered_log_array = [string.strip() for string in log_array if len(string.strip()) == 2]
         filtered_log = ''.join(filtered_log_array)
         struct_data = decode_packets(filtered_log)
-        print(struct_data)
+        for struct in struct_data:
+            print(struct)
     
 def console():
     try:
