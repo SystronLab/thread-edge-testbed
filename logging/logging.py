@@ -71,7 +71,7 @@ def get_ports():
         for port in ports:
             ports_l.append(port.name)
     elif sys.platform.startswith("linux") or sys.platform.startswith("cygwin"):
-        ports_l = glob.glob("/dev/ttyACM1")
+        ports_l = glob.glob("/dev/ttyACM*")
     else:
         print("No available ports found")
     if len(ports_l):
@@ -121,9 +121,11 @@ def get_dump_log():
 
 def parse_log():
     for device in thread_devices:
+        print("\n" + device.port)
         log_array = device.log.split(' ')
         filtered_log_array = [string.strip() for string in log_array if len(string.strip()) == 2]
         filtered_log = ''.join(filtered_log_array)
+        print(filtered_log)
         byte_data = bytes.fromhex(filtered_log)
         log_data = byte_data.decode('ascii', errors='ignore')
         print(log_data)

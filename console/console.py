@@ -107,7 +107,7 @@ def get_ports():
         for port in ports:
             ports_l.append(port.name)
     elif sys.platform.startswith("linux") or sys.platform.startswith("cygwin"):
-        ports_l = glob.glob("/dev/ttyACM1")
+        ports_l = glob.glob("/dev/ttyACM*")
     else:
         print("No available ports found")
     if len(ports_l):
@@ -249,12 +249,14 @@ def rssi(output = True):
     for device in thread_devices:
         rssi_l = device.run_command("scan energy " + str(SCAN_LENGTH)).split("\n")
         for index, key in enumerate(device.rssi_dict):
-            rssi_i = (
-                rssi_l[index + 2].find("|", rssi_l[index + 2].find("|") + 1) + 3
-            )  # +3 for the padding
-            device.rssi_dict[key] = rssi_l[index + 2][rssi_i : rssi_i + 3]
+            try:
+                rssi_i = (
+                    rssi_l[index + 2].find("|", rssi_l[index + 2].find("|") + 1) + 3
+                )  # +3 for the padding
+                device.rssi_dict[key] = rssi_l[index + 2][rssi_i : rssi_i + 3]
+            except Exception as e:
+                print(e)
         if output:
-            # print(device.rssi_dict)
             print(device.port + " | " + device.rloc + " | " + device.rssi_dict[CHANNEL] + "dBm")
 
 
