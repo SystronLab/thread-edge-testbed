@@ -85,15 +85,13 @@ def get_ports():
     return ports_l
 
 def decode_packets(hex_log):
-# Convert hex string to bytes
+    # Convert hex string to bytes
     log_bytes = bytes.fromhex(hex_log)
-    
     # Define the struct format for a single 32-byte packetData
     packet_format = '>HHHBB24s'
     packet_size = struct.calcsize(packet_format)
     
     # Define constant sizes for fields
-    HEADER_SIZE = 8  # for Message Log Format
     packets = []
     
     # Process each 32-byte packetData struct in the log
@@ -120,14 +118,14 @@ def decode_packets(hex_log):
         
         # Decode the `data` field based on the log type identifier
         message_data = {}
-        
-        if log_type_identifier == 'M' and len(data_bytes) >= HEADER_SIZE:
+                
+        if log_type_identifier == 'M':
             # Message Log Format
             message_string = ""
             try:
                 message_string = data_bytes[8:data_bytes.find(b'\x00', 8)].decode() if b'\x00' in data_bytes[8:] else ""
             except UnicodeDecodeError:
-                message_string = "<Undecodable Message String>"
+                message_string = ""
             
             message_data = {
                 'logTypeIdentifier': 'M',
@@ -136,7 +134,7 @@ def decode_packets(hex_log):
                 'messageString': message_string
             }
         
-        elif log_type_identifier == 'R' and len(data_bytes) >= 6:
+        elif log_type_identifier == 'R':
             # Received Packet Format
             message_data = {
                 'logTypeIdentifier': 'R',
@@ -145,7 +143,7 @@ def decode_packets(hex_log):
                 'receivedPacket': data_bytes[6:]  # Keep as bytes to avoid decoding issues
             }
         
-        elif log_type_identifier == 'T' and len(data_bytes) >= 6:
+        elif log_type_identifier == 'T':
             # Transmitted Packet Format
             message_data = {
                 'logTypeIdentifier': 'T',
@@ -165,8 +163,6 @@ def decode_packets(hex_log):
         })
     
     return packets
-
-
 
 def link_devices():
     print("Finding thread devices...")
@@ -205,7 +201,6 @@ def get_dump_log():
         device.serial.readline()
         rawlog = device.serial.read(10000).decode()
         device.log = rawlog
-        print(rawlog)
 
 def parse_log():
     for device in thread_devices:
@@ -220,7 +215,7 @@ def parse_log():
 def console():
     try:
         while True:
-            cmd = input(">")
+            cmd = input("> ")
             if cmd == "clear":
                 clear_logs()
             if cmd == "log":
