@@ -1,0 +1,280 @@
+[00:00:00.267,974] <inf> ieee802154_nrf5: nRF5 802154 radio initialized         
+[00:00:00.272,796] <inf> fs_nvs: 2 Sectors of 4096 bytes                        
+[00:00:00.272,796] <inf> fs_nvs: alloc wra: 0, d90                              
+[00:00:00.272,796] <inf> fs_nvs: data wra: 0, 868                               
+*** Booting nRF Connect SDK v3.5.99-ncs1-1 ***                                  
+[00:00:00.326,293] <inf> cli: *** Device: nRF5340-DK                            
+[00:00:00.326,293] <inf> cli: *** Program: cli_dk_jamming_detection, written by4
+[00:00:00.326,324] <inf> cli: *** FW Version: 0.010                             
+[00:00:00.326,354] <inf> cli: *** Thread device type: FTD                       
+[00:00:00.326,385] <inf> cli: *** Device Type: Power Socket                     
+[00:00:00.326,416] <inf> cli: *** Device Functions: 0x0000                      
+[00:00:00.326,416] <inf> cli: *** Max allowed children = 32                     
+[00:00:02.354,187] <inf> cli: *** Thread device is detatched!                   
+[00:00:19.092,651] <inf> cli: *** started Jamming Detector                      
+[00:00:19.092,712] <inf> cli: *** Thread device role is Leader, RLOC16 = 0xd000 
+[00:00:21.260,620] <inf> cli: *** Thread device role is Router, RLOC16 = 0xd000 
+[00:00:40.815,032] <inf> cli: *** Jamming countermeasure enabled                
+[00:00:50.096,557] <wrn> cli: *** Jamming detected on channel 11 (-32 dBm) ***  
+[00:00:51.095,672] <wrn> cli: *** Jamming detected on channel 11 (-31 dBm) ***  
+[00:00:52.093,475] <wrn> cli: *** Jamming detected on channel 11 (-32 dBm) ***  
+[00:00:53.095,092] <wrn> cli: *** Jamming detected on channel 11 (-31 dBm) ***  
+[00:00:54.096,557] <wrn> cli: *** Jamming detected on channel 11 (-32 dBm) ***  
+[00:00:55.094,207] <wrn> cli: *** Jamming detected on channel 11 (-31 dBm) ***  
+[00:00:56.094,818] <wrn> cli: *** Jamming detected on channel 11 (-31 dBm) ***  
+[00:00:57.096,313] <wrn> cli: *** Jamming detected on channel 11 (-32 dBm) ***  
+[00:00:58.094,879] <wrn> cli: *** Jamming detected on channel 11 (-31 dBm) ***  
+[00:00:59.094,604] <wrn> cli: *** Jamming detected on channel 11 (-32 dBm) ***  
+[00:00:59.144,409] <inf> cli: *** Thread device is detatched!                   
+[00:00:59.145,629] <inf> cli: *** Thread device is disabled!                    
+[00:00:59.180,084] <inf> cli: *** Thread device is detatched!                   
+[00:00:59.182,617] <inf> cli: *** hopped to new channel 15                      
+[00:01:17.889,831] <inf> cli: Channel Hop Time = 18761 ms                       
+[00:01:17.889,892] <inf> cli: *** Thread device role is Leader, RLOC16 = 0xd000 
+[00:01:50.183,441] <wrn> cli: *** Jamming detected on channel 15 (-35 dBm) ***  
+[00:01:51.182,434] <wrn> cli: *** Jamming detected on channel 15 (-35 dBm) ***  
+[00:01:52.183,502] <wrn> cli: *** Jamming detected on channel 15 (-35 dBm) ***  
+[00:01:53.204,956] <wrn> cli: *** Jamming detected on channel 15 (-35 dBm) ***  
+[00:01:54.184,143] <wrn> cli: *** Jamming detected on channel 15 (-35 dBm) ***  
+[00:01:55.183,441] <wrn> cli: *** Jamming detected on channel 15 (-35 dBm) ***  
+[00:01:56.183,166] <wrn> cli: *** Jamming detected on channel 15 (-36 dBm) ***  
+[00:01:57.183,227] <wrn> cli: *** Jamming detected on channel 15 (-35 dBm) ***  
+[00:01:58.183,349] <wrn> cli: *** Jamming detected on channel 15 (-35 dBm) ***  
+[00:01:59.183,013] <wrn> cli: *** Jamming detected on channel 15 (-35 dBm) ***  
+[00:01:59.238,189] <inf> cli: *** Thread device is detatched!                   
+[00:01:59.239,410] <inf> cli: *** Thread device is disabled!                    
+[00:01:59.258,789] <inf> cli: *** Thread device is detatched!                   
+[00:01:59.261,322] <inf> cli: *** hopped to new channel 12                      
+[00:02:17.634,094] <inf> cli: Channel Hop Time = 18405 ms                       
+[00:02:17.634,613] <inf> cli: *** Thread device role is Leader, RLOC16 = 0xd000 
+[00:02:54.260,467] <wrn> cli: *** Jamming detected on channel 12 (-33 dBm) ***  
+[00:02:55.262,634] <wrn> cli: *** Jamming detected on channel 12 (-33 dBm) ***  
+[00:02:56.261,383] <wrn> cli: *** Jamming detected on channel 12 (-33 dBm) ***  
+[00:02:57.262,817] <wrn> cli: *** Jamming detected on channel 12 (-32 dBm) ***  
+[00:02:58.264,282] <wrn> cli: *** Jamming detected on channel 12 (-32 dBm) ***  
+[00:02:59.261,444] <wrn> cli: *** Jamming detected on channel 12 (-33 dBm) ***  
+[00:03:00.263,427] <wrn> cli: *** Jamming detected on channel 12 (-32 dBm) ***  
+[00:03:01.259,490] <wrn> cli: *** Jamming detected on channel 12 (-33 dBm) ***  
+[00:03:02.262,603] <wrn> cli: *** Jamming detected on channel 12 (-33 dBm) ***  
+[00:03:03.262,481] <wrn> cli: *** Jamming detected on channel 12 (-33 dBm) ***  
+[00:03:03.326,873] <inf> cli: *** Thread device is detatched!                   
+[00:03:03.328,125] <inf> cli: *** Thread device is disabled!                    
+[00:03:03.355,834] <inf> cli: *** Thread device is detatched!                   
+[00:03:03.358,367] <inf> cli: *** hopped to new channel 17                      
+[00:03:22.189,697] <inf> cli: Channel Hop Time = 18875 ms                       
+[00:03:22.189,758] <inf> cli: *** Thread device role is Leader, RLOC16 = 0xd000 
+[00:03:24.073,638] <inf> cli: *** Thread device role is Router, RLOC16 = 0xd000 
+[00:04:09.360,260] <wrn> cli: *** Jamming detected on channel 17 (-34 dBm) ***  
+[00:04:10.361,267] <wrn> cli: *** Jamming detected on channel 17 (-35 dBm) ***  
+[00:04:11.356,719] <wrn> cli: *** Jamming detected on channel 17 (-35 dBm) ***  
+[00:04:12.358,642] <wrn> cli: *** Jamming detected on channel 17 (-35 dBm) ***  
+[00:04:13.360,778] <wrn> cli: *** Jamming detected on channel 17 (-35 dBm) ***  
+[00:04:14.361,755] <wrn> cli: *** Jamming detected on channel 17 (-35 dBm) ***  
+[00:04:15.356,994] <wrn> cli: *** Jamming detected on channel 17 (-35 dBm) ***  
+[00:04:16.357,604] <wrn> cli: *** Jamming detected on channel 17 (-35 dBm) ***  
+[00:04:17.359,191] <wrn> cli: *** Jamming detected on channel 17 (-34 dBm) ***  
+[00:04:18.357,238] <wrn> cli: *** Jamming detected on channel 17 (-35 dBm) ***  
+[00:04:18.447,113] <inf> cli: *** Thread device is detatched!                   
+[00:04:18.448,425] <inf> cli: *** Thread device is disabled!                    
+[00:04:18.473,815] <inf> cli: *** Thread device is detatched!                   
+[00:04:18.476,318] <inf> cli: *** hopped to new channel 20                      
+[00:04:36.848,175] <inf> cli: Channel Hop Time = 18406 ms                       
+[00:04:36.848,419] <inf> cli: *** Thread device role is Leader, RLOC16 = 0xd000 
+[00:04:38.210,632] <inf> cli: *** Thread device role is Router, RLOC16 = 0xd000 
+[00:05:24.477,752] <wrn> cli: *** Jamming detected on channel 20 (-32 dBm) ***  
+[00:05:25.476,196] <wrn> cli: *** Jamming detected on channel 20 (-32 dBm) ***  
+[00:05:26.477,478] <wrn> cli: *** Jamming detected on channel 20 (-33 dBm) ***  
+[00:05:27.476,806] <wrn> cli: *** Jamming detected on channel 20 (-32 dBm) ***  
+[00:05:28.476,409] <wrn> cli: *** Jamming detected on channel 20 (-32 dBm) ***  
+[00:05:29.475,219] <wrn> cli: *** Jamming detected on channel 20 (-32 dBm) ***  
+[00:05:30.477,111] <wrn> cli: *** Jamming detected on channel 20 (-32 dBm) ***  
+[00:05:31.476,928] <wrn> cli: *** Jamming detected on channel 20 (-32 dBm) ***  
+[00:05:32.475,799] <wrn> cli: *** Jamming detected on channel 20 (-32 dBm) ***  
+[00:05:33.480,590] <wrn> cli: *** Jamming detected on channel 20 (-33 dBm) ***  
+[00:05:33.556,549] <inf> cli: *** Thread device is detatched!                   
+[00:05:33.557,769] <inf> cli: *** Thread device is disabled!                    
+[00:05:33.586,578] <inf> cli: *** Thread device is detatched!                   
+[00:05:33.589,141] <inf> cli: *** hopped to new channel 14                      
+[00:05:51.546,447] <inf> cli: Channel Hop Time = 18002 ms                       
+[00:05:51.546,691] <inf> cli: *** Thread device role is Leader, RLOC16 = 0xd000 
+[00:05:53.396,453] <inf> cli: *** Thread device role is Router, RLOC16 = 0xd000 
+[00:06:39.588,409] <wrn> cli: *** Jamming detected on channel 14 (-35 dBm) ***  
+[00:06:40.591,979] <wrn> cli: *** Jamming detected on channel 14 (-35 dBm) ***  
+[00:06:41.592,651] <wrn> cli: *** Jamming detected on channel 14 (-34 dBm) ***  
+[00:06:42.587,799] <wrn> cli: *** Jamming detected on channel 14 (-34 dBm) ***  
+[00:06:43.591,003] <wrn> cli: *** Jamming detected on channel 14 (-35 dBm) ***  
+[00:06:44.592,529] <wrn> cli: *** Jamming detected on channel 14 (-35 dBm) ***  
+[00:06:45.589,294] <wrn> cli: *** Jamming detected on channel 14 (-35 dBm) ***  
+[00:06:46.590,667] <wrn> cli: *** Jamming detected on channel 14 (-35 dBm) ***  
+[00:06:47.590,759] <wrn> cli: *** Jamming detected on channel 14 (-35 dBm) ***  
+[00:06:48.588,470] <wrn> cli: *** Jamming detected on channel 14 (-35 dBm) ***  
+[00:06:48.621,643] <inf> cli: *** Thread device is detatched!                   
+[00:06:48.622,863] <inf> cli: *** Thread device is disabled!                    
+[00:06:48.655,242] <inf> cli: *** Thread device is detatched!                   
+[00:06:48.657,775] <inf> cli: *** hopped to new channel 11                      
+[00:07:05.856,079] <inf> cli: Channel Hop Time = 17248 ms                       
+[00:07:05.856,109] <inf> cli: *** Thread device role is Leader, RLOC16 = 0xd000 
+[00:07:08.797,241] <inf> cli: *** Thread device role is Router, RLOC16 = 0xd000 
+[00:07:54.658,264] <wrn> cli: *** Jamming detected on channel 11 (-31 dBm) ***  
+[00:07:55.657,897] <wrn> cli: *** Jamming detected on channel 11 (-31 dBm) ***  
+[00:07:56.658,355] <wrn> cli: *** Jamming detected on channel 11 (-31 dBm) ***  
+[00:07:57.658,691] <wrn> cli: *** Jamming detected on channel 11 (-31 dBm) ***  
+[00:07:58.658,691] <wrn> cli: *** Jamming detected on channel 11 (-32 dBm) ***  
+[00:07:59.656,707] <wrn> cli: *** Jamming detected on channel 11 (-31 dBm) ***  
+[00:08:00.657,287] <wrn> cli: *** Jamming detected on channel 11 (-31 dBm) ***  
+[00:08:01.655,914] <wrn> cli: *** Jamming detected on channel 11 (-31 dBm) ***  
+[00:08:02.657,348] <wrn> cli: *** Jamming detected on channel 11 (-31 dBm) ***  
+[00:08:03.659,149] <wrn> cli: *** Jamming detected on channel 11 (-31 dBm) ***  
+[00:08:03.748,626] <inf> cli: *** Thread device is disabled!                    
+[00:08:03.760,345] <inf> cli: *** Thread device is detatched!                   
+[00:08:03.762,664] <inf> cli: *** hopped to new channel 18                      
+[00:08:23.168,121] <inf> cli: Channel Hop Time = 19424 ms                       
+[00:08:23.203,796] <inf> cli: *** Thread device role is Router, RLOC16 = 0xd000 
+[00:09:09.763,458] <wrn> cli: *** Jamming detected on channel 18 (-35 dBm) ***  
+[00:09:10.763,336] <wrn> cli: *** Jamming detected on channel 18 (-35 dBm) ***  
+[00:09:11.760,528] <wrn> cli: *** Jamming detected on channel 18 (-35 dBm) ***  
+[00:09:12.761,749] <wrn> cli: *** Jamming detected on channel 18 (-35 dBm) ***  
+[00:09:13.762,115] <wrn> cli: *** Jamming detected on channel 18 (-35 dBm) ***  
+[00:09:14.761,413] <wrn> cli: *** Jamming detected on channel 18 (-35 dBm) ***  
+[00:09:15.760,711] <wrn> cli: *** Jamming detected on channel 18 (-35 dBm) ***  
+[00:09:16.761,291] <wrn> cli: *** Jamming detected on channel 18 (-35 dBm) ***  
+[00:09:17.765,289] <wrn> cli: *** Jamming detected on channel 18 (-34 dBm) ***  
+[00:09:18.762,878] <wrn> cli: *** Jamming detected on channel 18 (-34 dBm) ***  
+[00:09:18.829,162] <inf> cli: *** Thread device is disabled!                    
+[00:09:18.845,397] <inf> cli: *** Thread device is detatched!                   
+[00:09:18.847,717] <inf> cli: *** hopped to new channel 25                      
+[00:09:36.446,166] <inf> cli: Channel Hop Time = 17621 ms                       
+[00:09:36.446,228] <inf> cli: *** Thread device role is Leader, RLOC16 = 0xd000 
+[00:09:37.919,250] <inf> cli: *** Thread device role is Router, RLOC16 = 0xd000 
+[00:10:24.845,977] <wrn> cli: *** Jamming detected on channel 25 (-33 dBm) ***  
+[00:10:25.848,907] <wrn> cli: *** Jamming detected on channel 25 (-33 dBm) ***  
+[00:10:26.848,785] <wrn> cli: *** Jamming detected on channel 25 (-33 dBm) ***  
+[00:10:27.848,724] <wrn> cli: *** Jamming detected on channel 25 (-33 dBm) ***  
+[00:10:28.846,923] <wrn> cli: *** Jamming detected on channel 25 (-33 dBm) ***  
+[00:10:29.851,135] <wrn> cli: *** Jamming detected on channel 25 (-33 dBm) ***  
+[00:10:30.845,520] <wrn> cli: *** Jamming detected on channel 25 (-33 dBm) ***  
+[00:10:31.849,304] <wrn> cli: *** Jamming detected on channel 25 (-33 dBm) ***  
+[00:10:32.848,388] <wrn> cli: *** Jamming detected on channel 25 (-33 dBm) ***  
+[00:10:33.849,273] <wrn> cli: *** Jamming detected on channel 25 (-33 dBm) ***  
+[00:10:33.920,288] <inf> cli: *** Thread device is detatched!                   
+[00:10:33.921,508] <inf> cli: *** Thread device is disabled!                    
+[00:10:33.942,016] <inf> cli: *** Thread device is detatched!                   
+[00:10:33.944,519] <inf> cli: *** hopped to new channel 24                      
+[00:10:52.385,437] <inf> cli: Channel Hop Time = 18474 ms                       
+[00:10:52.385,681] <inf> cli: *** Thread device role is Leader, RLOC16 = 0xd000 
+[00:10:53.542,968] <inf> cli: *** Thread device role is Router, RLOC16 = 0xd000 
+[00:11:39.948,425] <wrn> cli: *** Jamming detected on channel 24 (-32 dBm) ***  
+[00:11:40.942,443] <wrn> cli: *** Jamming detected on channel 24 (-32 dBm) ***  
+[00:11:41.946,960] <wrn> cli: *** Jamming detected on channel 24 (-32 dBm) ***  
+[00:11:42.946,716] <wrn> cli: *** Jamming detected on channel 24 (-32 dBm) ***  
+[00:11:43.943,786] <wrn> cli: *** Jamming detected on channel 24 (-32 dBm) ***  
+[00:11:44.981,201] <wrn> cli: *** Jamming detected on channel 24 (-32 dBm) ***  
+[00:11:45.944,946] <wrn> cli: *** Jamming detected on channel 24 (-32 dBm) ***  
+[00:11:46.947,479] <wrn> cli: *** Jamming detected on channel 24 (-32 dBm) ***  
+[00:11:47.942,596] <wrn> cli: *** Jamming detected on channel 24 (-32 dBm) ***  
+[00:11:48.945,953] <wrn> cli: *** Jamming detected on channel 24 (-32 dBm) ***  
+[00:11:49.049,316] <inf> cli: *** Thread device is disabled!                    
+[00:11:49.072,052] <inf> cli: *** Thread device is detatched!                   
+[00:11:49.074,554] <inf> cli: *** hopped to new channel 13                      
+[00:12:08.318,695] <inf> cli: Channel Hop Time = 19275 ms                       
+[00:12:08.340,606] <inf> cli: *** Thread device role is Router, RLOC16 = 0xd000 
+[00:12:55.073,913] <wrn> cli: *** Jamming detected on channel 13 (-34 dBm) ***  
+[00:12:56.078,125] <wrn> cli: *** Jamming detected on channel 13 (-34 dBm) ***  
+[00:12:57.072,906] <wrn> cli: *** Jamming detected on channel 13 (-34 dBm) ***  
+[00:12:58.076,721] <wrn> cli: *** Jamming detected on channel 13 (-34 dBm) ***  
+[00:12:59.074,645] <wrn> cli: *** Jamming detected on channel 13 (-34 dBm) ***  
+[00:13:00.076,354] <wrn> cli: *** Jamming detected on channel 13 (-34 dBm) ***  
+[00:13:01.075,531] <wrn> cli: *** Jamming detected on channel 13 (-34 dBm) ***  
+[00:13:02.076,995] <wrn> cli: *** Jamming detected on channel 13 (-34 dBm) ***  
+[00:13:03.074,859] <wrn> cli: *** Jamming detected on channel 13 (-34 dBm) ***  
+[00:13:04.077,758] <wrn> cli: *** Jamming detected on channel 13 (-34 dBm) ***  
+[00:13:04.155,609] <inf> cli: *** Thread device is disabled!                    
+[00:13:04.181,579] <inf> cli: *** Thread device is detatched!                   
+[00:13:04.184,112] <inf> cli: *** hopped to new channel 19                      
+[00:13:22.475,219] <inf> cli: Channel Hop Time = 18326 ms                       
+[00:13:22.475,494] <inf> cli: *** Thread device role is Leader, RLOC16 = 0xd000 
+[00:13:24.239,013] <inf> cli: *** Thread device role is Router, RLOC16 = 0xd000 
+[00:14:10.184,692] <wrn> cli: *** Jamming detected on channel 19 (-34 dBm) ***  
+[00:14:11.183,563] <wrn> cli: *** Jamming detected on channel 19 (-34 dBm) ***  
+[00:14:12.187,255] <wrn> cli: *** Jamming detected on channel 19 (-34 dBm) ***  
+[00:14:13.186,981] <wrn> cli: *** Jamming detected on channel 19 (-34 dBm) ***  
+[00:14:14.183,105] <wrn> cli: *** Jamming detected on channel 19 (-34 dBm) ***  
+[00:14:15.185,089] <wrn> cli: *** Jamming detected on channel 19 (-34 dBm) ***  
+[00:14:16.183,624] <wrn> cli: *** Jamming detected on channel 19 (-34 dBm) ***  
+[00:14:17.182,708] <wrn> cli: *** Jamming detected on channel 19 (-34 dBm) ***  
+[00:14:18.303,283] <wrn> cli: *** Jamming detected on channel 19 (127 dBm) ***  
+[00:14:19.187,133] <wrn> cli: *** Jamming detected on channel 19 (-34 dBm) ***  
+[00:14:19.254,333] <inf> cli: *** Thread device is disabled!                    
+[00:14:19.283,691] <inf> cli: *** Thread device is detatched!                   
+[00:14:19.285,980] <inf> cli: *** hopped to new channel 21                      
+[00:14:37.141,998] <inf> cli: Channel Hop Time = 17894 ms                       
+[00:14:37.142,517] <inf> cli: *** Thread device role is Leader, RLOC16 = 0xd000 
+[00:15:25.287,231] <wrn> cli: *** Jamming detected on channel 21 (-32 dBm) ***  
+[00:15:26.286,590] <wrn> cli: *** Jamming detected on channel 21 (-33 dBm) ***  
+[00:15:27.285,461] <wrn> cli: *** Jamming detected on channel 21 (-32 dBm) ***  
+[00:15:28.288,360] <wrn> cli: *** Jamming detected on channel 21 (-32 dBm) ***  
+[00:15:29.285,522] <wrn> cli: *** Jamming detected on channel 21 (-33 dBm) ***  
+[00:15:30.287,933] <wrn> cli: *** Jamming detected on channel 21 (-33 dBm) ***  
+[00:15:31.284,393] <wrn> cli: *** Jamming detected on channel 21 (-32 dBm) ***  
+[00:15:32.319,671] <wrn> cli: *** Jamming detected on channel 21 (127 dBm) ***  
+[00:15:33.286,895] <wrn> cli: *** Jamming detected on channel 21 (-32 dBm) ***  
+[00:15:34.286,132] <wrn> cli: *** Jamming detected on channel 21 (-32 dBm) ***  
+[00:15:34.306,701] <inf> cli: *** Thread device is detatched!                   
+[00:15:34.307,922] <inf> cli: *** Thread device is disabled!                    
+[00:15:34.327,362] <inf> cli: *** Thread device is detatched!                   
+[00:15:34.329,681] <inf> cli: *** hopped to new channel 16                      
+[00:15:52.348,815] <inf> cli: Channel Hop Time = 18051 ms                       
+[00:15:52.348,846] <inf> cli: *** Thread device role is Leader, RLOC16 = 0xd000 
+[00:16:40.331,146] <wrn> cli: *** Jamming detected on channel 16 (-35 dBm) ***  
+[00:16:41.331,359] <wrn> cli: *** Jamming detected on channel 16 (-35 dBm) ***  
+[00:16:42.329,040] <wrn> cli: *** Jamming detected on channel 16 (-35 dBm) ***  
+[00:16:43.329,010] <wrn> cli: *** Jamming detected on channel 16 (-35 dBm) ***  
+[00:16:44.332,763] <wrn> cli: *** Jamming detected on channel 16 (-36 dBm) ***  
+[00:16:45.331,481] <wrn> cli: *** Jamming detected on channel 16 (-36 dBm) ***  
+[00:16:46.329,803] <wrn> cli: *** Jamming detected on channel 16 (-35 dBm) ***  
+[00:16:47.328,582] <wrn> cli: *** Jamming detected on channel 16 (-35 dBm) ***  
+[00:16:48.329,498] <wrn> cli: *** Jamming detected on channel 16 (-35 dBm) ***  
+[00:16:49.333,801] <wrn> cli: *** Jamming detected on channel 16 (-36 dBm) ***  
+[00:16:49.405,364] <inf> cli: *** Thread device is detatched!                   
+[00:16:49.406,585] <inf> cli: *** Thread device is disabled!                    
+[00:16:49.430,328] <inf> cli: *** Thread device is detatched!                   
+[00:16:49.432,830] <inf> cli: *** hopped to new channel 22                      
+[00:17:08.286,376] <inf> cli: Channel Hop Time = 18892 ms                       
+[00:17:08.286,407] <inf> cli: *** Thread device role is Leader, RLOC16 = 0xd000 
+[00:17:09.489,471] <inf> cli: *** Thread device role is Router, RLOC16 = 0xd000 
+[00:17:55.432,373] <wrn> cli: *** Jamming detected on channel 22 (-32 dBm) ***  
+[00:17:56.432,006] <wrn> cli: *** Jamming detected on channel 22 (-32 dBm) ***  
+[00:17:57.431,915] <wrn> cli: *** Jamming detected on channel 22 (-32 dBm) ***  
+[00:17:58.435,241] <wrn> cli: *** Jamming detected on channel 22 (-32 dBm) ***  
+[00:17:59.430,541] <wrn> cli: *** Jamming detected on channel 22 (-33 dBm) ***  
+[00:18:00.435,455] <wrn> cli: *** Jamming detected on channel 22 (-32 dBm) ***  
+[00:18:01.430,541] <wrn> cli: *** Jamming detected on channel 22 (-32 dBm) ***  
+[00:18:02.434,600] <wrn> cli: *** Jamming detected on channel 22 (-32 dBm) ***  
+[00:18:03.430,969] <wrn> cli: *** Jamming detected on channel 22 (-32 dBm) ***  
+[00:18:04.431,274] <wrn> cli: *** Jamming detected on channel 22 (-32 dBm) ***  
+[00:18:04.444,061] <inf> cli: *** Thread device is disabled!                    
+[00:18:04.469,207] <inf> cli: *** Thread device is detatched!                   
+[00:18:04.471,710] <inf> cli: *** hopped to new channel 26                      
+[00:18:22.946,289] <inf> cli: Channel Hop Time = 18512 ms                       
+[00:18:22.946,563] <inf> cli: *** Thread device role is Leader, RLOC16 = 0xd000 
+[00:18:24.612,884] <inf> cli: *** Thread device role is Router, RLOC16 = 0xd000 
+uart:~$ ot channel                                                              
+26                                                                              
+Done                                                                            
+[01:05:41.473,846] <wrn> cli: *** Jamming detected on channel 26 (-32 dBm) ***  
+[01:05:42.474,822] <wrn> cli: *** Jamming detected on channel 26 (-33 dBm) ***  
+[01:05:43.483,825] <wrn> cli: *** Jamming detected on channel 26 (-33 dBm) ***  
+[01:05:44.472,290] <wrn> cli: *** Jamming detected on channel 26 (-33 dBm) ***  
+[01:05:45.473,693] <wrn> cli: *** Jamming detected on channel 26 (-33 dBm) ***  
+[01:05:46.474,639] <wrn> cli: *** Jamming detected on channel 26 (-32 dBm) ***  
+[01:05:47.474,395] <wrn> cli: *** Jamming detected on channel 26 (-32 dBm) ***  
+[01:05:48.473,114] <wrn> cli: *** Jamming detected on channel 26 (-33 dBm) ***  
+[01:05:49.472,656] <wrn> cli: *** Jamming detected on channel 26 (-33 dBm) ***  
+[01:05:50.470,977] <wrn> cli: *** Jamming detected on channel 26 (-32 dBm) ***  
+[01:05:50.486,480] <inf> cli: *** Thread device is disabled!                    
+[01:05:50.513,122] <inf> cli: *** Thread device is detatched!                   
+[01:05:50.515,655] <inf> cli: *** hopped to new channel 23                      
+[01:06:09.342,224] <inf> cli: Channel Hop Time = 18862 ms                       
+[01:06:09.379,394] <inf> cli: *** Thread device role is Router, RLOC16 = 0xd000 
+[01:08:33.435,638] <inf> cli: *** Thread device role is Router, RLOC16 = 0xd000 
+uart:~$ 
