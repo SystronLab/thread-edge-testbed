@@ -1,0 +1,31 @@
+[00:00:48.583,129] <wrn> cli: *** Jamming detected on channel 11 (-39 dBm) ***  
+[00:01:16.576,873] <inf> cli: Channel Hop Time = 18959 ms                       
+[00:01:48.658,325] <wrn> cli: *** Jamming detected on channel 15 (-39 dBm) ***                   
+[00:02:16.163,787] <inf> cli: Channel Hop Time = 18451 ms                       
+[00:03:19.611,663] <inf> cli: Channel Hop Time = 17805 ms
+[00:04:07.830,841] <wrn> cli: *** Jamming detected on channel 17 (-37 dBm) *** 
+[00:04:35.344,879] <inf> cli: Channel Hop Time = 18450 ms      
+[00:05:22.941,741] <wrn> cli: *** Jamming detected on channel 20 (-36 dBm) *** 
+[00:05:50.600,921] <inf> cli: Channel Hop Time = 18599 ms  
+[00:06:38.042,266] <wrn> cli: *** Jamming detected on channel 14 (-41 dBm) *** 
+[00:07:07.024,139] <inf> cli: Channel Hop Time = 19975 ms         
+[00:07:53.100,616] <wrn> cli: *** Jamming detected on channel 11 (-38 dBm) ***
+[00:08:20.153,076] <inf> cli: Channel Hop Time = 17989 ms              
+[00:09:08.181,182] <wrn> cli: *** Jamming detected on channel 18 (-40 dBm) ***  
+[00:09:34.842,956] <inf> cli: Channel Hop Time = 17600 ms            
+[00:10:23.277,191] <wrn> cli: *** Jamming detected on channel 25 (-34 dBm) ***  
+[00:10:49.791,687] <inf> cli: Channel Hop Time = 17446 ms                
+[00:11:38.379,272] <wrn> cli: *** Jamming detected on channel 24 (-35 dBm) ***  
+[00:12:05.640,808] <inf> cli: Channel Hop Time = 18195 ms                      
+[00:12:54.484,100] <wrn> cli: *** Jamming detected on channel 13 (-39 dBm) *** 
+[00:13:21.237,091] <inf> cli: Channel Hop Time = 18747 ms                       
+[00:14:08.529,418] <wrn> cli: *** Jamming detected on channel 19 (-41 dBm) ***  
+[00:14:35.590,026] <inf> cli: Channel Hop Time = 17997 ms                       
+[00:15:23.738,555] <wrn> cli: *** Jamming detected on channel 21 (-35 dBm) ***  
+[00:15:50.373,443] <inf> cli: Channel Hop Time = 17568 ms                       
+[00:16:38.824,401] <wrn> cli: *** Jamming detected on channel 16 (-38 dBm) ***  
+[00:17:06.386,688] <inf> cli: Channel Hop Time = 18503 ms                       
+[00:17:53.907,653] <wrn> cli: *** Jamming detected on channel 22 (-36 dBm) ***  
+[00:18:21.460,296] <inf> cli: Channel Hop Time = 18485 ms                       
+[01:05:40.013,641] <wrn> cli: *** Jamming detected on channel 26 (-35 dBm) ***  
+[01:06:07.791,931] <inf> cli: Channel Hop Time = 18709 ms                       
